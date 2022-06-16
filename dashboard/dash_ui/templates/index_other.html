@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!--<link rel="stylesheet" href="../style.css">-->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    
+    <!--for Google Charts-->
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+    <!--for Chart.js-->
+    <script src="https://cdn.anychart.com/releases/8.7.1/js/anychart-core.min.js"></script>
+    <script src="https://cdn.anychart.com/releases/8.7.1/js/anychart-radar.min.js"></script>
+    
+
+
+	<meta charset="UTF-8">
+	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+        google.charts.load("current", {packages:["corechart"]});
+        google.charts.load('current', {'packages':['sankey']});
+        google.charts.setOnLoadCallback(pieChart);
+        google.charts.setOnLoadCallback(barChart);
+        google.charts.setOnLoadCallback(sankeyChart);
+
+        function pieChart() {
+            var data = google.visualization.arrayToDataTable([
+                ['Participant', 'Talking Time'],
+                {% for pair in new_data %}
+                    ['{{ pair.0 }}', {{ pair.1 }}],
+                {% endfor %}
+            ]);
+
+            var options = {
+                backgroundColor: '#f1f1f1',
+                legend: 'none',
+                pieSliceText: 'none',
+                tooltip: { trigger: 'none' },
+                slices: {
+                    
+                    0: { color: '{{all_colors.0}}' },
+                    1: { color: '{{all_colors.1}}' },
+                    2: { color: '{{all_colors.2}}' },
+                    3: { color: '{{all_colors.3}}' },
+                    4: { color: '{{all_colors.4}}' },
+                    5: { color: '{{all_colors.5}}' }
+                }
+            };
+
+            var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+            chart.draw(data, options);
+        }
+
+        //Bar Chart
+        function barChart() {
+
+        var data = google.visualization.arrayToDataTable([
+            ['Participant', 'Talk Time', { role: 'style' } ],
+            {% for group in bar_style %}
+                ['{{ group.0 }}', {{ group.1 }}, 'color: {{group.2}}'],
+            {% endfor %}
+        ]);
+
+        var options = {
+            legend: 'none',
+            tooltip: { trigger: 'none' },
+            backgroundColor: '#f1f1f1',
+            hAxis: {
+                gridlines: {
+                    color: 'transparent'
+                },
+                textStyle: {
+                    color: 'transparent'
+                }
+            },
+            vAxis: {
+                gridlines: {
+                    color: 'transparent'
+                },
+                textStyle: {
+                    color: 'transparent'
+                }
+            },
+
+        };
+
+        var chart = new google.visualization.ColumnChart(
+        document.getElementById('barchart'));
+
+        chart.draw(data, options);
+        }
+
+        //Sankey Chart
+        function sankeyChart() {
+
+        var data = google.visualization.arrayToDataTable([
+            ['Participant', 'Participant', 'Interactions' ],
+            {% for group in sankey_data %}
+                //['Person 1', 'Person 2', 5]
+                {% if group.0 == 'Person 1' %}
+                    {% if group.2 == 0 %}
+                        ['{{ group.0 }}', '{{ group.1 }}', 1],
+                    {% else %}
+                        ['{{ group.0 }}', '{{ group.1 }}', {{ group.2 }}],
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+        ]);
+
+
+        var colors = ['#006992', '#bc4b51', '#eca400', '#5b8e7d', '#784c9f'];
+
+        var options = {
+            tooltip: {
+                isHtml: true,
+            },
+            sankey: {
+                node: {
+                    colors: colors,
+                    label: { 
+                         color: 'transparent',
+                    },
+                    interactivity: false,
+                },
+                link: {
+                    colorMode: 'target',
+                    color: { fill: '#d799ae', fillOpacity: 0.9 },
+                }
+            } 
+        };
+
+        // Instantiates and draws our chart, passing in some options.
+        var chart = new google.visualization.Sankey(
+            document.getElementById('sankeychart'));
+        chart.draw(data, options);
+        
+        }
+
+    </script>
+</head>
+<body>
+    <div class="container"><h2>Testing Charts</h2></div>
+    
+    <!-- used to disable the tooltip for the Sankey Chart-->
+    <style>div.google-visualization-tooltip { display: none; }</style>
+    
+	<div class="container" style="background: #f1f1f1;">
+        <div class="row">
+            <div class="col-sm-3" align="center">
+                <h3>Pie Chart</h3>
+                <div id="piechart" style="width: 75%; height: 150px;"></div>
+            </div>
+            <div class="col-sm-3" align="center">
+                <h3>Bar Chart</h3>
+                <div id="barchart" style="width: 75%; height: 200px;"></div>
+            </div>
+            <div class="col-sm-3" align="center">
+                <h3>Sankey Chart</h3>
+                <div id="sankeychart" style="width: 65%; height: 100px; margin-top: 20%;"></div>
+            </div>
+            <div class="col-sm-3" align="center">
+                <h3>All Participants:</h3>
+                {% for each_user in user_colors %}
+                    <!--<div style="color: {{each_user.1}}">{{each_user.0}}</div>-->
+                    <div>{{each_user.0}}  <span class="badge" style="background-color: {{each_user.1}}">&nbsp;</span></div>
+                {% endfor %}
+            </div>
+        </div>
+	</div>
+
+    <div class="container"><h2>Testing Colors</h2></div>
+    <div class="row">
+        <div class="col-sm-1" style="background-color: {{all_colors.0}}; color: white;">&nbsp;</div>
+        <div class="col-sm-1" style="background-color: {{all_colors.1}}; color: white;">&nbsp;</div>
+        <div class="col-sm-1" style="background-color: {{all_colors.2}}; color: white;">&nbsp;</div>
+        <div class="col-sm-1" style="background-color: {{all_colors.3}}; color: white;">&nbsp;</div>
+        <div class="col-sm-1" style="background-color: {{all_colors.4}}; color: white;">&nbsp;</div>
+        <div class="col-sm-1" style="background-color: {{all_colors.5}}; color: white;">&nbsp;</div>
+    </div>
+
+</body>
+</html>

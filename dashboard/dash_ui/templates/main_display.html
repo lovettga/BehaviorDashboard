@@ -1,0 +1,546 @@
+{%load static%}
+<!DOCTYPE html>
+<html>
+<head>
+
+    <!-- Bootstrap -->
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+    
+    <!--for Google Charts-->
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+    <!-- Google Charts -->
+    <!-- Text Charts -->
+    <script type="text/javascript">
+        google.charts.load('current', {'packages':['corechart']});
+        google.charts.load('current', {'packages':['sankey']});
+
+        google.charts.setOnLoadCallback(talkChart);
+        google.charts.setOnLoadCallback(overlapChart);
+        google.charts.setOnLoadCallback(backChart);
+        google.charts.setOnLoadCallback(interactionChart);
+  
+        //talk chart
+        function talkChart() {
+  
+            var data = google.visualization.arrayToDataTable([
+                ['Participant', 'Talking Time'],
+                {% for pair in talk_data %}
+                    ['{{ pair.0 }}', {{ pair.1 }}],
+                {% endfor %}
+            ]);
+  
+            var options = {
+                backgroundColor: '#f1f1f1',
+                legend: 'none',
+                title: '',
+                chartArea: {left:20, top:6, bottom: 6, width:'100%', height:'100%'},
+                fontName: 'Times New Roman',
+                //legend: {alignment: 'center', position: 'right'}
+                slices: {
+                    
+                    0: { color: '{{all_colors.0}}' },
+                    1: { color: '{{all_colors.1}}' },
+                    2: { color: '{{all_colors.2}}' },
+                    3: { color: '{{all_colors.3}}' },
+                    4: { color: '{{all_colors.4}}' },
+                    5: { color: '{{all_colors.5}}' }
+                }
+            };
+    
+            var chart = new google.visualization.PieChart(document.getElementById('talkchart'));
+    
+            chart.draw(data, options);
+        }
+        //overlap chart
+        function overlapChart() {
+
+            var data = google.visualization.arrayToDataTable([
+                ['Participant', 'Talk Time', { role: 'style' } ],
+                {% for group in overlap_data %}
+                    ['{{ group.0 }}', {{ group.1 }}, 'color: {{group.2}}'],
+                {% endfor %}
+            ]);
+
+
+            var options = {
+                hAxis: {
+                    title: 'Participants',
+                    textStyle: {
+                    color: 'transparent'
+                }
+                },
+                vAxis: {
+                    title: 'Number of Overlaps',
+                    format: 'decimal'
+                },
+                fontName: 'Times New Roman',
+                legend: 'none',
+                backgroundColor: '#f1f1f1',
+            };
+
+            var chart = new google.visualization.ColumnChart(
+            document.getElementById('overlapchart'));
+
+            chart.draw(data, options);
+        }
+
+        //back-channel chart
+        function backChart() {
+
+            var data = google.visualization.arrayToDataTable([
+                ['Participant', 'Talk Time', { role: 'style' } ],
+                {% for group in back_data %}
+                    ['{{ group.0 }}', {{ group.1 }}, 'color: {{group.2}}'],
+                {% endfor %}
+            ]);
+
+
+            var options = {
+                hAxis: {
+                    title: 'Participants',
+                    textStyle: {
+                    color: 'transparent'
+                }
+                },
+                vAxis: {
+                    title: 'Number of Overlaps',
+                    format: 'decimal'
+                },
+                fontName: 'Times New Roman',
+                legend: 'none',
+                backgroundColor: '#f1f1f1',
+            };
+
+            var chart = new google.visualization.ColumnChart(
+            document.getElementById('backchart'));
+
+            chart.draw(data, options);
+        }
+
+        
+        //interactions chart
+        //Sankey Chart
+        function interactionChart() {
+
+            var data = google.visualization.arrayToDataTable([
+                ['Participant', 'Participant', 'Interactions' ],
+                {% for group in interaction_data %}
+                    //['Person 1', 'Person 2', 5]
+                    
+                    {% if group.2 == 0 %}
+                        ['{{ group.0 }}', '{{ group.1 }}', 1],
+                    {% else %}
+                        ['{{ group.0 }}', '{{ group.1 }}', {{ group.2 }}],
+                    {% endif %}
+                    
+                {% endfor %}
+            ]);
+
+
+            var colors = ['#006992', '#bc4b51', '#eca400', '#5b8e7d', '#784c9f'];
+
+            var options = {
+                tooltip: {
+                    textStyle: {
+                        color: '#000',
+                        fontName: 'Times New Roman',
+                        fontSize: 9,
+                    },
+                },
+                sankey: {
+                    node: {
+                        colors: colors,
+                        label: { 
+                            color: 'transparent',
+                        },
+                        interactivity: false,
+                    },
+                    link: {
+                        colorMode: 'target',
+                        color: { fill: '#d799ae', fillOpacity: 0.9 },
+                    }
+                } 
+            };
+
+            // Instantiates and draws our chart, passing in some options.
+            var chart = new google.visualization.Sankey(
+                document.getElementById('interactionchart'));
+            chart.draw(data, options);
+
+            }
+    </script>
+
+
+</head>
+<body style="font-family: 'Times New Roman'">
+
+    <!--
+    <div class="card" align="right" style="background: #a32c2c; width: 110px; height: 150px; float: right; padding-right: 10px; margin-right: 25px;">
+        <div class="card-body">
+          This is some text within a card body.
+        </div>
+      </div>
+    -->
+
+
+<!-- ################ top bar ################# -->
+    {% if layout == '1' %}
+    <p>&nbsp;</p>
+    <div class="container" style="background: #f1f1f1; padding-bottom: 10px;">
+        <div class="row">
+            <div class="col-sm-2"  align="center">
+                <p class="text-center">Percentage of Talking Time</p>
+                <div id="talkchart" style="width: 75%; height: 100px;"></div>
+            </div>
+            <div class="col-sm-2" align="center">
+                <p class="text-center">Overlaps in Talking</p>
+                <div id="overlapchart" style="width: 90%; height: 100px;"></div>
+            </div>
+            <div class="col-sm-2" align="center">
+                <p class="text-center">Back-Channels</p>
+                <div id="backchart" style="width: 90%; height: 100px;"></div>
+            </div>
+            <div class="col-sm-1" align="center" style="padding-right: 5px;">
+                <p class="text-right">Emotion</p>
+                <br> <br> <!-- used for top spacing in emotional box -->
+                <div class="progress justify-content-center" style="height: 15px; width: 100px; transform: rotate(-90deg);">
+                    <div class="progress-bar bg-success" role="progressbar" style="width: 60%; background-color: {{all_colors.0}};" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+            </div>
+            <div class="col-sm-2" align="center">
+                {% if participant_num > 2 %}
+                    <p class="text-center">Paricipant Interactions</p>
+                    <div id="interactionchart" style="width: 70%; height: 85px; margin-top: 15%;"></div>
+                {% else %}
+                    &nbsp;
+                {% endif %}
+            </div>
+            
+            <div class="col-sm-1" align="center">
+                <p>Participants:</p>
+                {% for each_user in user_colors %}
+                    <!--<div style="color: {{each_user.1}}">{{each_user.0}}</div>-->
+                    <div style="font-size: 10px;">{{each_user.0}}  <span class="badge" style="background-color: {{each_user.1}}">&nbsp;</span></div>
+                {% endfor %}
+            </div>
+            <div class="col-sm-2" style="background: #f2f2f2;" align="center">
+                <!-- Settings -->
+                <div class="dropdown show" style="display: inline-block; ">
+                    <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <span style="color: black;">
+                            <!-- Gear Icon -->
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-gear" viewBox="0 0 16 16">
+                                <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z"/>
+                                <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115l.094-.319z"/>
+                            </svg>
+                        </span>
+                    </a>
+                
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+
+                    <!-- FUNCTIONALITY WILL BE ADDED LATER
+                        Size:
+                    <a class="dropdown-item" href="#">Small /</a>
+                    <a class="dropdown-item" href="#">/ Large</a>
+                    <div class="dropdown-divider"></div>
+                        Info:
+                    <a class="dropdown-item" href="#">Text /</a>
+                    <a class="dropdown-item" href="#">/ No Text</a>
+                    <div class="dropdown-divider"></div>
+                    -->
+                        Layout:
+                    <a class="dropdown-item" href="{% url 'main' meeting_id=meeting_object.id user_id=user_profile.id layout=1 size=size info=1 %}">Top Bar /</a>
+                    <a class="dropdown-item" href="{% url 'main' meeting_id=meeting_object.id user_id=user_profile.id layout=2 size=size info=1 %}">/ Split /</a>
+                    <a class="dropdown-item" href="{% url 'main' meeting_id=meeting_object.id user_id=user_profile.id layout=3 size=size info=1 %}">/ Side 1 /</a>
+                    <a class="dropdown-item" href="{% url 'main' meeting_id=meeting_object.id user_id=user_profile.id layout=4 size=size info=1 %}">/ Side 2</a>
+                    </div>
+                </div>
+                <p>Hello {{user_profile.first_name}}!</p>
+                <p>Meeting: {{meeting_object.title}}</p>
+            </div>
+        </div>
+    </div>
+
+<!-- ################ split ################# -->
+    {% elif layout == '2' %}
+        <div class="container" style="padding-top: 2%;">
+            <div class="row">
+                <div class="col-sm-2" style="background: #f1f1f1; height: 525px;">
+                    <br>
+                    <p class="text-center">Percentage of Talking Time</p>
+                    <div id="talkchart" style="width: 75%; height: 100px;"></div>
+
+                    <br>
+                    <p class="text-center">Overlaps in Talking</p>
+                    <div id="overlapchart" style="width: 90%; height: 100px;"></div>
+
+                    <br>
+                    <p class="text-center">Back-Channels</p>
+                    <div id="backchart" style="width: 90%; height: 100px;"></div>
+
+                </div>
+                <div class="col-sm-8">
+                    &nbsp;
+                </div>
+                <div class="col-sm-2" style="background: #f1f1f1; height: 525px;" align="center">
+                    <br>
+                    <!-- Settings -->
+                    <div class="dropdown show" style="display: inline-block; ">
+                        <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <span style="color: black;">
+                                <!-- Gear Icon -->
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-gear" viewBox="0 0 16 16">
+                                    <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z"/>
+                                    <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115l.094-.319z"/>
+                                </svg>
+                            </span>
+                        </a>
+                    
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+        
+                        <!-- FUNCTIONALITY WILL BE ADDED LATER -->
+                            Size:
+                        <a class="dropdown-item" href="#">Small /</a>
+                        <a class="dropdown-item" href="#">/ Large</a>
+                        <div class="dropdown-divider"></div>
+                            Info:
+                        <a class="dropdown-item" href="#">Text /</a>
+                        <a class="dropdown-item" href="#">/ No Text</a>
+                        <div class="dropdown-divider"></div>
+                        
+                            Layout:
+                        <a class="dropdown-item" href="{% url 'main' meeting_id=meeting_object.id user_id=user_profile.id layout=1 size=size info=1 %}">Top Bar /</a>
+                        <a class="dropdown-item" href="{% url 'main' meeting_id=meeting_object.id user_id=user_profile.id layout=2 size=size info=1 %}">/ Split /</a>
+                        <a class="dropdown-item" href="{% url 'main' meeting_id=meeting_object.id user_id=user_profile.id layout=3 size=size info=1 %}">/ Side 1 /</a>
+                        <a class="dropdown-item" href="{% url 'main' meeting_id=meeting_object.id user_id=user_profile.id layout=4 size=size info=1 %}">/ Side 2</a>
+                        </div>
+                    </div>
+                    <p>Hello {{user_profile.first_name}}!</p>
+                    <p>Meeting: {{meeting_object.title}}</p>
+                    
+                    <!--RIGHT SIDE CHARTS-->
+                    <br>
+                    <p>Participants:</p>
+                    {% for each_user in user_colors %}
+                        <div style="font-size: 10px;">{{each_user.0}}  <span class="badge" style="background-color: {{each_user.1}}">&nbsp;</span></div>
+                    {% endfor %}
+
+                    <br>
+                    <p class="text">Emotion</p>
+                    <div class="progress justify-content-center" style="height: 15px; width: 100px;">
+                        <div class="progress-bar bg-success" role="progressbar" style="width: 60%; background-color: {{all_colors.0}};" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+
+                    <br>
+
+                    {% if participant_num > 2 %}
+                        <p class="text-center">Paricipant Interactions</p>
+                        <div id="interactionchart" style="width: 70%; height: 85px; margin-top: 15%;"></div>
+                    {% else %}
+                        &nbsp;
+                    {% endif %}
+
+                </div>
+        
+        
+            </div>
+        </div>
+        
+<!-- ################ side 1 ################# -->
+    {% elif layout == '3' %}
+        <div class="container" style="padding-top: 2%;">
+            <div class="row">
+                <div class="col-sm-2" style="background: #f1f1f1; height: 525px;" align="center">
+                    <br>
+                    <!-- Settings -->
+                    <div class="dropdown show" style="display: inline-block; ">
+                        <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <span style="color: black;">
+                                <!-- Gear Icon -->
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-gear" viewBox="0 0 16 16">
+                                    <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z"/>
+                                    <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115l.094-.319z"/>
+                                </svg>
+                            </span>
+                        </a>
+                    
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+
+                        <!-- FUNCTIONALITY WILL BE ADDED LATER
+                            Size:
+                        <a class="dropdown-item" href="#">Small /</a>
+                        <a class="dropdown-item" href="#">/ Large</a>
+                        <div class="dropdown-divider"></div>
+                            Info:
+                        <a class="dropdown-item" href="#">Text /</a>
+                        <a class="dropdown-item" href="#">/ No Text</a>
+                        <div class="dropdown-divider"></div>
+                        -->
+                            Layout:
+                        <a class="dropdown-item" href="{% url 'main' meeting_id=meeting_object.id user_id=user_profile.id layout=1 size=size info=1 %}">Top Bar /</a>
+                        <a class="dropdown-item" href="{% url 'main' meeting_id=meeting_object.id user_id=user_profile.id layout=2 size=size info=1 %}">/ Split /</a>
+                        <a class="dropdown-item" href="{% url 'main' meeting_id=meeting_object.id user_id=user_profile.id layout=3 size=size info=1 %}">/ Side 1 /</a>
+                        <a class="dropdown-item" href="{% url 'main' meeting_id=meeting_object.id user_id=user_profile.id layout=4 size=size info=1 %}">/ Side 2</a>
+                        </div>
+                    </div>
+                    <p>Hello {{user_profile.first_name}}!</p>
+                    <p>Meeting: {{meeting_object.title}}</p>
+
+                    <!-- Left Side Charts -->
+                    <br>
+                    <p class="text-center">Percentage of Talking Time</p>
+                    <div id="talkchart" style="width: 75%; height: 100px;"></div>
+
+                    <br>
+                    <p class="text">Emotion</p>
+                    <div class="progress justify-content-center" style="height: 15px; width: 100px;">
+                        <div class="progress-bar bg-success" role="progressbar" style="width: 60%; background-color: {{all_colors.0}};" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+
+                    <br>
+                    {% if participant_num > 2 %}
+                        <p class="text-center">Paricipant Interactions</p>
+                        <div id="interactionchart" style="width: 70%; height: 85px; margin-top: 15%;"></div>
+                    {% else %}
+                        &nbsp;
+                    {% endif %}
+
+                </div>
+                <div class="col-sm-2" style="background: #f1f1f1; height: 525px;" align="center">
+                
+                    <!-- Right Side Charts -->   
+                    <br> 
+                    <p>Participants:</p>
+                    {% for each_user in user_colors %}
+                        <div style="font-size: 10px;">{{each_user.0}}  <span class="badge" style="background-color: {{each_user.1}}">&nbsp;</span></div>
+                    {% endfor %}
+
+                    <br>
+                    <p class="text-center">Overlaps in Talking</p>
+                    <div id="overlapchart" style="width: 90%; height: 100px;"></div>
+
+                    <br>
+                    <p class="text-center">Back-Channels</p>
+                    <div id="backchart" style="width: 90%; height: 100px;"></div>
+
+                </div>
+            </div>
+        </div>
+
+<!-- ################ side 2 ################# -->
+    {% else %}
+        <div class="container" style="padding-top: 2%;">
+            <div class="row">
+                <div class="col-sm-2" style="background: #f1f1f1" align="center">
+                    <!-- Settings -->
+                    <div class="dropdown show" style="display: inline-block; ">
+                        <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <span style="color: black;">
+                                <!-- Gear Icon -->
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-gear" viewBox="0 0 16 16">
+                                    <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z"/>
+                                    <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115l.094-.319z"/>
+                                </svg>
+                            </span>
+                        </a>
+                    
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+        
+                        <!-- FUNCTIONALITY WILL BE ADDED LATER
+                            Size:
+                        <a class="dropdown-item" href="#">Small /</a>
+                        <a class="dropdown-item" href="#">/ Large</a>
+                        <div class="dropdown-divider"></div>
+                            Info:
+                        <a class="dropdown-item" href="#">Text /</a>
+                        <a class="dropdown-item" href="#">/ No Text</a>
+                        <div class="dropdown-divider"></div>
+                        -->
+                            Layout:
+                        <a class="dropdown-item" href="{% url 'main' meeting_id=meeting_object.id user_id=user_profile.id layout=1 size=size info=1 %}">Top Bar /</a>
+                        <a class="dropdown-item" href="{% url 'main' meeting_id=meeting_object.id user_id=user_profile.id layout=2 size=size info=1 %}">/ Split /</a>
+                        <a class="dropdown-item" href="{% url 'main' meeting_id=meeting_object.id user_id=user_profile.id layout=3 size=size info=1 %}">/ Side 1 /</a>
+                        <a class="dropdown-item" href="{% url 'main' meeting_id=meeting_object.id user_id=user_profile.id layout=4 size=size info=1 %}">/ Side 2</a>
+                        </div>
+                    </div>
+                    <p>Hello {{user_profile.first_name}}!</p>
+                    <p>Meeting: {{meeting_object.title}}</p>
+
+                    <!-- Charts -->
+                    <br> 
+                    <p>Participants:</p>
+                    {% for each_user in user_colors %}
+                        <div style="font-size: 10px;">{{each_user.0}}  <span class="badge" style="background-color: {{each_user.1}}">&nbsp;</span></div>
+                    {% endfor %}
+
+                    <br>
+                    <p class="text-center">Percentage of Talking Time</p>
+                    <div id="talkchart" style="width: 75%; height: 100px;"></div>
+
+                    <br>
+                    <p class="text-center">Overlaps in Talking</p>
+                    <div id="overlapchart" style="width: 90%; height: 100px;"></div>
+
+                    <br>
+                    <p class="text-center">Back-Channels</p>
+                    <div id="backchart" style="width: 90%; height: 100px;"></div>
+
+                    <br>
+                    <p class="text">Emotion</p>
+                    <div class="progress justify-content-center" style="height: 15px; width: 100px;">
+                        <div class="progress-bar bg-success" role="progressbar" style="width: 60%; background-color: {{all_colors.0}};" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+
+                    <br>
+                    {% if participant_num > 2 %}
+                        <p class="text-center">Paricipant Interactions</p>
+                        <div id="interactionchart" style="width: 70%; height: 85px; margin-top: 15%;"></div>
+                    {% else %}
+                        &nbsp;
+                    {% endif %}
+
+                </div>
+            </div>
+        </div>
+
+
+
+
+    {% endif %}
+    <br>
+
+
+
+    <!-- ################## Switch Meeting/User ####################### -->
+    <div class="container" syle="height: 500px;">
+        <div style="height: 500px;">&nbsp;</div>
+    </div>
+
+    <div class="container">
+        <h4 class="text-center">Testing Options</h4>
+        <div class="row">
+            <div class="col-sm-4" style="padding-bottom: 7px" align="center">
+                <h4>All Meetings:</h4>
+                {% for meeting in all_meetings %}
+                    <p>{{ meeting.title }} <a href="{% url 'main' meeting_id=meeting.id user_id=user_profile.id layout=layout size=size info=1 %}">View</a></p>
+                {% endfor %}
+            </div>
+            <div class="col-sm-4" style="padding-bottom: 7px" align="center">
+                <h4>Participants in: {{meeting_object.title}}</h4>
+                {% for each in participant_list %}
+                    <p>{{each}} <a href="{% url 'main' meeting_id=meeting_object.id user_id=each.id layout=layout size=size info=1 %}">View</a></p>
+                {% endfor %}
+            </div>
+            <div class="col-sm-4" style="padding-bottom: 7px" align="center">
+                <h4>All Users:</h4>
+                {% for each in user_list %}
+                    <p>{{each}}</p>
+                {% endfor %}
+            </div>
+    </div>
+
+
+</body>
