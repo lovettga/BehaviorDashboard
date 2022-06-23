@@ -170,7 +170,8 @@ def Access(request, user_id, meeting_id, layout, size, info):
     
     new_data = [('Person 1', 20.3), ('Person 2', 11.4), ('Person 3', 5.3), ('Person 4', 15), ('Person 5', 7)]
 
-    all_colors = ['#006992', '#bc4b51', '#eca400', '#5b8e7d', '#784c9f']   #Neutral-Company
+    # all_colors = ['#006992', '#bc4b51', '#eca400', '#5b8e7d', '#784c9f']   #Neutral-Company
+    all_colors = ['#f5793a', '#a95aa1', '#85c0f9', '#0f2080', '#006050']  # Color blind palette
 
     user_colors = []    # ['Person', 'blue']
     bar_style = []      # ['Person', 5, 'gray']
@@ -217,7 +218,7 @@ def Access(request, user_id, meeting_id, layout, size, info):
         count += 3
 
     # Emotion data
-    emotion_level = 4
+    emotion_level = 4 * 10
 
     count = 1
     # Interactions data
@@ -226,18 +227,42 @@ def Access(request, user_id, meeting_id, layout, size, info):
         if participant.id is not user_object.id:
             interaction_data.append((user_object, participant, int(count)))
             count += 2
-
-
-
-
     ##############################
+
+    ####      INFO OPTIONS    ####
+
+    pie_options = []
+    bar_options = []
+    sankey_options = []
+    # small text
+    if info == '1':
+        pie_options = ['100', 'percentage', 'selection', '10']
+        bar_options = ['#CCC', 'out', 'selection', '10', 'black']
+        sankey_options = ['true', 10]
+        settings_font = 14
+    # large text
+    elif info == '2':
+        pie_options = ['100', 'percentage', 'selection', '14']
+        bar_options = ['#CCC', 'out', 'selection', '14', 'black']
+        sankey_options = ['true', 14]
+        settings_font = 16
+    # no text
+    else:
+        pie_options = ['100', 'none', 'none', '10']
+        bar_options = ['transparent', 'none', 'none', '10', 'transparent']
+        sankey_options = ['true', 10]
+        settings_font = 14
+
+    ###############################
 
 
     context = {'participant_list': new_participant_list, 'user_list': user_list, 'size': size, 'layout': layout,\
-        'meeting_object': meeting_object, 'all_meetings': all_meetings, 'new_data': new_data,\
+        'meeting_object': meeting_object, 'all_meetings': all_meetings, 'new_data': new_data, 'info': info,\
         'user_colors': user_colors, 'bar_style': bar_style, 'sankey_data': sankey_data, 'all_colors': all_colors,\
         'user_profile': user_object, 'participant_num': participant_num, \
-        'talk_data': talk_data, 'overlap_data': overlap_data, 'back_data': back_data, 'emotion_level': emotion_level, 'interaction_data':interaction_data}
+        'talk_data': talk_data, 'overlap_data': overlap_data, 'back_data': back_data, 'emotion_level': emotion_level,\
+        'interaction_data':interaction_data, 'pie_options': pie_options, 'bar_options': bar_options,\
+        'sankey_options': sankey_options, 'settings_font': settings_font}
 
     return render(request, 'accessibility.html', context)        
 
