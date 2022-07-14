@@ -298,9 +298,9 @@
                 <div class="col-sm-2" style="background: #f1f1f1; width: 18.5%;" align="center">
                     <br>
                     {% if info == '2' %}
-                        <p class="text-center" style="font-size: 17px;">Percentage of Talking Time</p>
+                        <p class="text-center" style="font-size: 17px;">Talking Time</p>
                     {% else %}
-                        <p class="text-center">Percentage of Talking Time</p>
+                        <p class="text-center">Talking Time</p>
                     {% endif %}
                     {% if size == '1' %}
                         <div id="talkchart" style="width: 85%; height: 150px;"></div>
@@ -337,16 +337,16 @@
                 <div class="col-sm-2" style="background: #f1f1f1; width: 18.5%;" align="center">
                     <br>
                     {% if info == '2' %}
-                        <p class="text-center" style="font-size: 18px;">Emotion Level</p>
+                        <p class="text-center" style="font-size: 18px;">Attentiveness</p>
                     {% else %}
-                        <p class="text-center">Emotion Level</p>
+                        <p class="text-center">Attentiveness</p>
                     {% endif %}
                     {% if size == '1' %}
-                        <div class="progress justify-content-center" style="height: 20px; width: 90%;">
+                        <div class="progress justify-content-center" style="height: 20px; width: 90%; border-radius: 5px !important; background-color: white !important; box-shadow: inset 0 0 0 1.5px {{all_colors.0}} !important;">
                             <div class="progress-bar bg-success" role="progressbar" style="width: {{emotion_level}}%; background-color: {{all_colors.0}};" aria-valuenow="{{emotion_level}}" aria-valuemin="0" aria-valuemax="100"></div>
                         </div>
                     {% else %}
-                        <div class="progress justify-content-center" style="height: 15px; width: 100px;">
+                        <div class="progress justify-content-center" style="height: 15px; width: 100px; border-radius: 5px !important; background-color: white !important; box-shadow: inset 0 0 0 1.5px {{all_colors.0}} !important;">
                             <div class="progress-bar bg-success" role="progressbar" style="width: {{emotion_level}}%; background-color: {{all_colors.0}};" aria-valuenow="{{emotion_level}}" aria-valuemin="0" aria-valuemax="100"></div>
                         </div>
                     {% endif %}
@@ -354,9 +354,9 @@
                     
                     {% if participant_num > 2 %}
                     {% if info == '2' %}
-                        <p class="text-center" style="font-size: 18px;">Participant Interactions</p>
+                        <p class="text-center" style="font-size: 18px;">Interactions</p>
                     {% else %}
-                        <p class="text-center">Participant Interactions</p>
+                        <p class="text-center">Interactions</p>
                     {% endif %}
                         {% if size == '1' %}
                             <div id="interactionchart" style="width: 90%; height: 100px; margin-top: 15%;"></div>
@@ -435,9 +435,9 @@
 
                     <br>
                     {% if info == '2' %}
-                        <p class="text-center" style="font-size: 17px;">Percentage of Talking Time</p>
+                        <p class="text-center" style="font-size: 17px;">Talking Time</p>
                     {% else %}
-                        <p class="text-center">Percentage of Talking Time</p>
+                        <p class="text-center">Talking Time</p>
                     {% endif %}
                     {% if size == '1' %}
                         <div id="talkchart" style="width: 85%; height: 150px;"></div>
@@ -447,9 +447,9 @@
 
                     <br>
                     {% if info == '2' %}
-                        <p class="text-center" style="font-size: 18px;">Emotion Level</p>
+                        <p class="text-center" style="font-size: 18px;">Attentiveness</p>
                     {% else %}
-                        <p class="text-center">Emotion Level</p>
+                        <p class="text-center">Attentiveness</p>
                     {% endif %}
                     {% if size == '1' %}
                         <div class="progress justify-content-center" style="height: 20px; width: 90%;">
@@ -496,9 +496,9 @@
                     <br>
                     {% if participant_num > 2 %}
                     {% if info == '2' %}
-                        <p class="text-center" style="font-size: 18px;">Participant Interactions</p>
+                        <p class="text-center" style="font-size: 18px;">Interactions</p>
                     {% else %}
-                        <p class="text-center">Participant Interactions</p>
+                        <p class="text-center">Interactions</p>
                     {% endif %}
                         {% if size == '1' %}
                             <div id="interactionchart" style="width: 90%; height: 100px; margin-top: 15%;"></div>
@@ -577,9 +577,9 @@
 
                     <br>
                     {% if info == '2' %}
-                        <p class="text-center" style="font-size: 17px;">Percentage of Talking Time</p>
+                        <p class="text-center" style="font-size: 17px;">Talking Time</p>
                     {% else %}
-                        <p class="text-center">Percentage of Talking Time</p>
+                        <p class="text-center">Talking Time</p>
                     {% endif %}
                     {% if size == '1' %}
                         <div id="talkchart" style="width: 85%; height: 150px;"></div>
@@ -589,9 +589,9 @@
 
                     <br>
                     {% if info == '2' %}
-                        <p class="text-center" style="font-size: 18px;">Emotion Level</p>
+                        <p class="text-center" style="font-size: 18px;">Attentiveness</p>
                     {% else %}
-                        <p class="text-center">Emotion Level</p>
+                        <p class="text-center">Attentiveness</p>
                     {% endif %}
                     {% if size == '1' %}
                         <div class="progress justify-content-center" style="height: 20px; width: 90%;">
@@ -633,9 +633,9 @@
                     <br>
                     {% if participant_num > 2 %}
                     {% if info == '2' %}
-                        <p class="text-center" style="font-size: 18px;">Participant Interactions</p>
+                        <p class="text-center" style="font-size: 18px;">Interactions</p>
                     {% else %}
-                        <p class="text-center">Participant Interactions</p>
+                        <p class="text-center">Interactions</p>
                     {% endif %}
                         {% if size == '1' %}
                             <div id="interactionchart" style="width: 90%; height: 100px; margin-top: 15%;"></div>
@@ -712,9 +712,9 @@
 
                     <br>
                     {% if info == '2' %}
-                        <p class="text-center" style="font-size: 18px;">Emotion Level</p>
+                        <p class="text-center" style="font-size: 18px;">Attentiveness</p>
                     {% else %}
-                        <p class="text-center">Emotion Level</p>
+                        <p class="text-center">Attentiveness</p>
                     {% endif %}
                     {% if size == '1' %}
                         <div class="progress justify-content-center" style="height: 20px; width: 90%;">
@@ -730,9 +730,9 @@
 
                     {% if participant_num > 2 %}
                     {% if info == '2' %}
-                        <p class="text-center" style="font-size: 18px;">Participant Interactions</p>
+                        <p class="text-center" style="font-size: 18px;">Interactions</p>
                     {% else %}
-                        <p class="text-center">Participant Interactions</p>
+                        <p class="text-center">Interactions</p>
                     {% endif %}
                         {% if size == '1' %}
                             <div id="interactionchart" style="width: 90%; height: 100px; margin-top: 15%;"></div>
@@ -752,9 +752,9 @@
                 <div class="col-sm-2" style="background: #f1f1f1; height: 590px;" align="center">
                     <br>
                     {% if info == '2' %}
-                        <p class="text-center" style="font-size: 17px;">Percentage of Talking Time</p>
+                        <p class="text-center" style="font-size: 17px;">Talking Time</p>
                     {% else %}
-                        <p class="text-center">Percentage of Talking Time</p>
+                        <p class="text-center">Talking Time</p>
                     {% endif %}
                     {% if size == '1' %}
                         <div id="talkchart" style="width: 85%; height: 150px;"></div>
@@ -793,4 +793,9 @@
         </div>
     {% endif %}
 
+    <div class="alert alert-info" role="alert" style="width: 250px; margin: 15px;">
+        <a href="../html-link.htm" target="popup" onclick="window.open('../html-link.htm','name','width=1500,height=1500')">Open page in new window</a>
+    </div>
+    <!-- Gabby's computer: 'width=1200,height=800'-->
+    
 </body>

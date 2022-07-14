@@ -74,6 +74,19 @@ WSGI_APPLICATION = 'dashboard.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
+
+#DATABASES = {
+#    'default': {
+#        'ENGINE': 'django.db.backends.mysql',
+#        'NAME': 'testdatabase',
+#        'USER': 'Gabby',
+#        'PASSWORD': '12345',
+#        'HOST': '100.64.0.26',
+#        'PORT': '3306',    }
+#}
+
+### Django sqLite ###
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',

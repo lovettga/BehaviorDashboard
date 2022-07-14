@@ -1,2 +1,4 @@
 django
 gviz_api
+mysqlclient
+mysql-connector

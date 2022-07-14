@@ -15,4 +15,8 @@ urlpatterns = [
     path('main/<str:user_id>/<str:meeting_id>/<str:layout>/<str:size>/<str:info>/', views.Main, name='main'),
     path('access/<str:user_id>/<str:meeting_id>/<str:layout>/<str:size>/<str:info>/', views.Access, name='access'),
     path('scratch/<str:user_id>/<str:meeting_id>/<str:layout>/<str:size>/<str:info>/', views.Scratch, name='scratch'),
+
+
+    #path('testing', views.TEST, name='test'),
+
 ]

@@ -385,3 +385,9 @@ def Scratch(request, user_id, meeting_id, layout, size, info):
         'pie_options': pie_options, 'bar_options': bar_options, 'sankey_options': sankey_options, 'settings_font': settings_font }
 
     return render(request, 'scratch.html', context) 
+
+
+
+#def TEST():
+#    result = test_database()
+#    return render(request, test_database.html)
