@@ -75,24 +75,25 @@ WSGI_APPLICATION = 'dashboard.wsgi.application'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
 
-#DATABASES = {
-#    'default': {
-#        'ENGINE': 'django.db.backends.mysql',
-#        'NAME': 'testdatabase',
-#        'USER': 'Gabby',
-#        'PASSWORD': '12345',
-#        'HOST': '100.64.0.26',
-#        'PORT': '3306',    }
-#}
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'hatdata',
+        'USER': 'Gabby',
+        'PASSWORD': 'HATLab',
+        'HOST': '10.0.0.2', 
+        'PORT': '3306',    
+    }
+}
 
 ### Django sqLite ###
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+#DATABASES = {
+#    'default': {
+#        'ENGINE': 'django.db.backends.sqlite3',
+#        'NAME': BASE_DIR / 'db.sqlite3',
+#    }
+#}
 
 
 # Password validation

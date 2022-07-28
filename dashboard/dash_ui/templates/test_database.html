@@ -8,8 +8,298 @@
     <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
     <link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="/dashboard/dash_ui/static/css/style.css">
+
+
+    <meta http-equiv="refresh" content="2">
+
     
+    <!-- Options for Gauge -->
+    <link href="https://fonts.googleapis.com/css?family=Comfortaa" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Orbitron" rel="stylesheet">
+
+    <!-- Google Charts -->
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+    <script type="text/javascript">
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.load('current', {'packages':['gauge']});
+      
+
+      google.charts.setOnLoadCallback(talkChart);
+      google.charts.setOnLoadCallback(overlapChart);
+      google.charts.setOnLoadCallback(emotionChart);
+
+      //talk chart
+      function talkChart() {
+
+          var data = google.visualization.arrayToDataTable([
+              ['Participant', 'Talking Time'],
+              {% for pair in cond_talk_data %}
+                  ['{{ pair.0 }}', {{ pair.1 }}],
+              {% endfor %}
+          ]);
+
+          var options = {
+                backgroundColor: '#f1f1f1',
+                //legend: 'none',
+                fontName: 'Times New Roman',
+
+                chartArea: {width:'{{pie_options.0}}%', height:'{{pie_options.0}}%'},
+                pieSliceText: '{{pie_options.1}}',
+                tooltip: {trigger: '{{pie_options.2}}'},
+                fontSize: '{{pie_options.3}}',
+                
+                slices: {
+                    
+                    0: { color: '{{all_colors.0}}' },
+                    1: { color: '{{all_colors.1}}' },
+                    2: { color: '{{all_colors.2}}' },
+                    3: { color: '{{all_colors.3}}' },
+                    4: { color: '{{all_colors.4}}' },
+                    5: { color: '{{all_colors.5}}' }
+                }
+            };
+  
+          var chart = new google.visualization.PieChart(document.getElementById('talkchart'));
+  
+          chart.draw(data, options);
+      }
+
+    //overlap chart
+    function overlapChart() {
+
+        var data = google.visualization.arrayToDataTable([
+            ['Participant', 'Talk Time', { role: 'style' } ],
+            {% for group in overlap_data %}
+                ['{{ group.0 }}', {{ group.1 }}, 'color: {{group.2}}'],
+            {% endfor %}
+        ]);
+
+
+        var options = {
+            hAxis: {
+                title: 'Participants',
+                textStyle: { color: 'transparent'},
+                gridlines: { color: '{{bar_options.0}}'},
+                textPosition: '{{bar_options.1}}',
+                titleTextStyle: {color: '{{bar_options.4}}'}
+            },
+            vAxis: {
+                title: 'Overlaps',
+                format: 'decimal',
+                gridlines: { color: '{{bar_options.0}}'},
+                textPosition: '{{bar_options.1}}',
+                titleTextStyle: {color: '{{bar_options.4}}'}
+            },
+            fontName: 'Times New Roman',
+            legend: 'none',
+            backgroundColor: '#f1f1f1',
+            fontSize: '{{bar_options.3}}',
+
+            tooltip: {trigger: '{{bar_options.2}}'}
+        };
+
+        var chart = new google.visualization.ColumnChart(
+        document.getElementById('overlapchart'));
+
+        chart.draw(data, options);
+    }
+
+
+    //emotion chart
+    function emotionChart(){
+
+        var data = google.visualization.arrayToDataTable([
+            ['Label', 'Value'],
+            ['', 80]
+        ]);
+
+        var options = {
+            backgroundColor: '#f1f1f1',
+            legend: 'none',
+            fontName: 'Times New Roman',
+            redFrom: 0, redTo: 15,
+            yellowFrom:70, yellowTo: 100,
+            minorTicks: 5
+        };
+
+        var chart = new google.visualization.Gauge(document.getElementById('emotionchart'));
+
+        chart.draw(data, options);
+
+    }
+
+    </script>
+
+    <!-- Gauge Chart Styling stuff -->
+    <style>
+        /* Outer-ring */
+        #emotionchart circle:nth-child(1) {
+        stroke-width: 5;
+        stroke: #999;
+        fill: #f1f1f1;
+        }
+
+        /* Main background */
+        #emotionchart circle:nth-child(2) {
+        fill: #f1f1f1;
+        stroke: #ccc;
+        stroke-width: 5;
+        }
+
+        /* Circle of the pointer */
+        #emotionchart circle:nth-child(3) {
+        fill: #222222;
+        stroke: #222222;
+        stroke-width: 3px;
+        }
+
+        /* Main text of the gauge */
+        #emotionchart text {
+        fill: black;
+        font-family: 'Times New Roman';
+        }
+
+        /* Current value text */
+        #emotionchart text:nth-child(1) {
+        fill: transparent;
+        font-size: 33;
+        font-weight: 700;
+        font-family: 'Times New Roman';
+        }
+
+        /* Ticks */
+        #emotionchart path {
+        stroke: #535353;
+        }
+
+        /* Circle */
+        #emotionchart path:nth-child(2) {
+        fill: #222222;
+        stroke: #222222;
+        stroke-width: 2px;
+        fill-opacity: 1;
+        }
+
+        /* Warning area */
+        #emotionchart path:nth-child(3) {
+        fill: #5a915a;
+        }
+
+        /* Danger area */
+        #emotionchart path:nth-child(4) {
+        fill: #833333;
+        }
+    </style>
+
+
 </head>
 <body>
-    <p>Testing the other database</p>
+    <h3 style="margin-left: 5px;">Testing the mySQL database</h3>
+
+
+
+    <div class="container" style="padding-top: 2%;">
+        <div class="row" style="background: #f1f1f1; height: 250px;">
+            <div class="col-sm-2" style="background: #f1f1f1; width: 35%;" align="center">
+                <br>
+                <div id="talkchart" style="width: 95%; height: 200px;"></div>
+            </div>
+            
+            <div class="col-sm-2" style="background: #f1f1f1; width: 25%;" align="center">
+                <br>
+                <div id="overlapchart" style="width: 100%; height: 120px;"></div>
+            </div>
+            <div class="col-sm-2" style="background: #f1f1f1; width: 25%;" align="center">
+                <br>
+                <div id="emotionchart" style="width: 85%; height: 120px;"></div>
+            </div>
+        
+        
+            <div class="col-sm-2" style="background: #f1f1f1; width: 35%;" align="center">
+                <br>
+                <p><strong>All Users</strong></p>
+                {% for each_user in user_colors%}
+                    <p>{{each_user.0}} </p>
+                {% endfor %}
+            </div>
+        
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="col-sm-2" style="background: #f1f1f1; width: 40%;" align="center">
+            <h4 style="margin-left: 30px;">Talkstream Table</h4>
+            <table class="table" style="width: 500px;">
+                <thead>
+                <tr>
+                    <th scope="col">Counter</th>
+                    <th scope="col">Name</th>
+                </tr>
+                </thead>
+                <tbody>
+                    {% for each_data in all_data%}
+                    <tr>
+                        <td>{{each_data.counter}}</td>
+                        <td>{{each_data.dd_user.username}}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="col-sm-2" style="background: #f1f1f1; width: 40%;" align="center">
+            <h4 style="margin-left: 30px;">Cond. Talkstream Table</h4>
+            <table class="table" style="width: 500px;">
+                <thead>
+                <tr>
+                    <th scope="col">Counter</th>
+                    <th scope="col">Name</th>
+                </tr>
+                </thead>
+                <tbody>
+                    {% for each_data in cond_data%}
+                    <tr>
+                        <td>{{each_data.counter}}</td>
+                        <td>{{each_data.dd_con.username}}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+
+    
+<!--
+    <div class="container">
+        <h4 style="margin-left: 30px;">Key Test Table</h4>
+        <table class="table" style="width: 500px; margin-left: 50px;">
+            <thead>
+            <tr>
+                <th scope="col">Primary Key (ID)</th>
+                <th scope="col">Value</th>
+                <th scope="col">Name (user ID)</th>
+            </tr>
+            </thead>
+            <tbody>
+                {% for pair in key_table%}
+                <tr>
+                    <td>{{pair.key_test_primary}}</td>
+                    <td>{{pair.other}}</td>
+                    <td>{{pair.key_test_link.username}} ({{pair.key_test_link}})</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    -->
+
+    
+
+    <!--
+    <div class="alert alert-info" role="alert" style="width: 250px; margin: 15px;">
+        <a href="../html-link.htm" target="popup" onclick="window.open('../html-link.htm','name','width=1500,height=1500')">Open page in new window</a>
+    </div>
+-->
+
 </body>
