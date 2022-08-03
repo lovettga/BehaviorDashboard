@@ -4,44 +4,69 @@ from django.db import models
 # py manage.py inspectdb > models.py 
 # ^^ USE THIS TO GET THE UPDATED MODELS.PY FROM THE DASHABORD DATABASE
 
-class Users(models.Model):
-    username = models.CharField(db_column='Username', 
-                                max_length=50, 
-                                blank=True, 
-                                null=True)  # Field name made lowercase.
-    user_id = models.AutoField(db_column='User_ID', 
-                               primary_key=True)  # Field name made lowercase.
+
+class HDisplaytable(models.Model):
+    displaytable_iterator_key = models.AutoField(primary_key=True)
+    user_id = models.OneToOneField('HUsers', models.DO_NOTHING, db_column='display_ID')  # Field name made lowercase.
+    talktime = models.IntegerField(blank=True, null=True)
+    overlaps = models.IntegerField(blank=True, null=True)
+    backchannels = models.IntegerField(blank=True, null=True)
+    emotion = models.IntegerField(blank=True, null=True)
 
     class Meta:
         managed = False
-        db_table = 'users'
+        db_table = 'h_displaytable'
 
-class Talkstream(models.Model):
-    dd_primary = models.AutoField(db_column='DD_Primary', primary_key=True)  # Field name made lowercase.
-    counter = models.IntegerField(db_column='Counter', blank=True, null=True)  # Field name made lowercase.
-    dd_user = models.ForeignKey('Users', models.DO_NOTHING, db_column='DD_User_ID')  # Field name made lowercase.
 
-    class Meta:
-        managed = False
-        db_table = 'talkstream'
-
-class TalkstreamCondensed(models.Model):
-    dd_con_key = models.AutoField(db_column='DD_Con_Key', primary_key=True)  # Field name made lowercase.
-    counter = models.IntegerField(db_column='Counter', blank=True, null=True)  # Field name made lowercase.
-    dd_con = models.OneToOneField('Users', models.DO_NOTHING, db_column='DD_Con_ID')  # Field name made lowercase.
+class HDyadics(models.Model):
+    dyadics_iterator_key = models.AutoField(primary_key=True)
+    dyadics = models.IntegerField(blank=True, null=True)
+    dyadics_user = models.ForeignKey('HUsers', models.DO_NOTHING, db_column='dyadics_user_ID', blank=True, null=True, related_name='user')  # Field name made lowercase.
+    dyadics_partner = models.ForeignKey('HUsers', models.DO_NOTHING, db_column='dyadics_partner_ID', blank=True, null=True, related_name='partner')  # Field name made lowercase.
 
     class Meta:
         managed = False
-        db_table = 'talkstream_condensed'
+        db_table = 'h_dyadics'
 
-class KeyTestTable(models.Model):
+
+class HKeyTestTable(models.Model):
     key_test_primary = models.AutoField(primary_key=True)
     other = models.IntegerField(blank=True, null=True)
-    key_test_link = models.ForeignKey('Users', models.DO_NOTHING, blank=True, null=True)
+    key_test_link = models.ForeignKey('HUsers', models.DO_NOTHING, blank=True, null=True)
 
     class Meta:
         managed = False
-        db_table = 'key_test_table'
+        db_table = 'h_key_test_table'
+
+
+class HTalkdatastream(models.Model):
+    talkdatastream_iterator_key = models.AutoField(primary_key=True)
+    counter = models.IntegerField(db_column='Counter', blank=True, null=True)  # Field name made lowercase.
+    talkdatastream = models.ForeignKey('HUsers', models.DO_NOTHING, db_column='talkdatastream_ID')  # Field name made lowercase.
+
+    class Meta:
+        managed = False
+        db_table = 'h_talkdatastream'
+
+
+class HTalkdatastreambackup(models.Model):
+    talkdatastreambackup_iterator_key = models.AutoField(primary_key=True)
+    counter = models.IntegerField(blank=True, null=True)
+    talkdatastreambackup = models.ForeignKey('HUsers', models.DO_NOTHING, db_column='talkdatastreambackup_ID', blank=True, null=True)  # Field name made lowercase.
+
+    class Meta:
+        managed = False
+        db_table = 'h_talkdatastreambackup'
+
+
+class HUsers(models.Model):
+    username = models.CharField(db_column='Username', max_length=50, blank=True, null=True)  # Field name made lowercase.
+    user_id = models.AutoField(db_column='User_ID', primary_key=True)  # Field name made lowercase.
+
+    class Meta:
+        managed = False
+        db_table = 'h_users'
+
 
 ##################################################################
 

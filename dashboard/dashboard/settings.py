@@ -25,7 +25,10 @@ SECRET_KEY = 'django-insecure-ivhieg$df&cc^+hyhr0!2fx=tjfzo2wj^n_26h5f)6n^2!7rw5
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'hatlab.pythonanywhere.com',
+    '127.0.0.1'
+]
 
 
 # Application definition

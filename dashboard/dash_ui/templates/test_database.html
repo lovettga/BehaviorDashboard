@@ -198,7 +198,7 @@
     <h3 style="margin-left: 5px;">Testing the mySQL database</h3>
 
 
-
+<!--
     <div class="container" style="padding-top: 2%;">
         <div class="row" style="background: #f1f1f1; height: 250px;">
             <div class="col-sm-2" style="background: #f1f1f1; width: 35%;" align="center">
@@ -267,8 +267,11 @@
             </table>
         </div>
     </div>
-    
-
+-->
+    <h4>Display Table</h4>
+    {% for each in display_table%}
+    <br><p>{{each.user_id.username}} - {{each.talktime}} - {{each.overlaps}} - {{each.backchannels}} - {{each.emotion}}</p>
+    {% endfor %}
     
 <!--
     <div class="container">
