@@ -138,6 +138,9 @@ def Scratch(request, user_id, layout, size, info):
 
 
     interaction_data = []
+    interaction_colors = []
+    # add the current user color first
+    interaction_colors.append(user_colors[0][1])
     for i in range(len(rapport_table)):
         first_user = rapport_table[i].primary_user
         other_user = rapport_table[i].secondary_user
@@ -146,6 +149,9 @@ def Scratch(request, user_id, layout, size, info):
         # if the first person in the interaction is the current user
         if first_user.user_id == user_profile.user_id:
             interaction_data.append((user_profile.username, other_user.username, int(value)))
+            for j in range(len(user_colors)):
+                if other_user.username == user_colors[j][0]:
+                    interaction_colors.append(user_colors[j][1])
 
     # sankey_data = [['Person 1', 'Person 2', 6], ['Person 1', 'Person 3', 2], ['Person 1', 'Person 4', 8]]
 
@@ -154,7 +160,7 @@ def Scratch(request, user_id, layout, size, info):
         'all_colors': all_colors, 'pie_options': pie_options, ' bar_options': bar_options, 'sankey_options': sankey_options,\
         'settings_font': settings_font, 'talk_data': talk_data, 'overlap_data': overlap_data, 'backchannel_data': backchannel_data, \
         'interaction_data': interaction_data, 'emotion_data': emotion_data,\
-        'new_display_table': new_display_table}
+        'interaction_colors': interaction_colors}
  
 
     # GET RID OF MEETING OBJECT
