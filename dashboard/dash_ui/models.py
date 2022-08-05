@@ -18,21 +18,10 @@ class HDisplaytable(models.Model):
         db_table = 'h_displaytable'
 
 
-class HDyadics(models.Model):
-    dyadics_iterator_key = models.AutoField(primary_key=True)
-    dyadics = models.IntegerField(blank=True, null=True)
-    dyadics_user = models.ForeignKey('HUsers', models.DO_NOTHING, db_column='dyadics_user_ID', blank=True, null=True, related_name='user')  # Field name made lowercase.
-    dyadics_partner = models.ForeignKey('HUsers', models.DO_NOTHING, db_column='dyadics_partner_ID', blank=True, null=True, related_name='partner')  # Field name made lowercase.
-
-    class Meta:
-        managed = False
-        db_table = 'h_dyadics'
-
-
 class HKeyTestTable(models.Model):
     key_test_primary = models.AutoField(primary_key=True)
     other = models.IntegerField(blank=True, null=True)
-    key_test_link = models.ForeignKey('HUsers', models.DO_NOTHING, blank=True, null=True)
+    user_id = models.ForeignKey('HUsers', models.DO_NOTHING, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -42,7 +31,7 @@ class HKeyTestTable(models.Model):
 class HTalkdatastream(models.Model):
     talkdatastream_iterator_key = models.AutoField(primary_key=True)
     counter = models.IntegerField(db_column='Counter', blank=True, null=True)  # Field name made lowercase.
-    talkdatastream = models.ForeignKey('HUsers', models.DO_NOTHING, db_column='talkdatastream_ID')  # Field name made lowercase.
+    user_id = models.ForeignKey('HUsers', models.DO_NOTHING, db_column='talkdatastream_ID')  # Field name made lowercase.
 
     class Meta:
         managed = False
@@ -52,7 +41,7 @@ class HTalkdatastream(models.Model):
 class HTalkdatastreambackup(models.Model):
     talkdatastreambackup_iterator_key = models.AutoField(primary_key=True)
     counter = models.IntegerField(blank=True, null=True)
-    talkdatastreambackup = models.ForeignKey('HUsers', models.DO_NOTHING, db_column='talkdatastreambackup_ID', blank=True, null=True)  # Field name made lowercase.
+    user_id = models.ForeignKey('HUsers', models.DO_NOTHING, db_column='talkdatastreambackup_ID', blank=True, null=True)  # Field name made lowercase.
 
     class Meta:
         managed = False
@@ -66,6 +55,16 @@ class HUsers(models.Model):
     class Meta:
         managed = False
         db_table = 'h_users'
+
+class HRapport(models.Model):
+    rapport_iterator_key = models.AutoField(primary_key=True)
+    primary_user = models.ForeignKey('HUsers', models.DO_NOTHING, db_column='primary_user_ID', related_name="primary")  # Field name made lowercase.
+    secondary_user = models.ForeignKey('HUsers', models.DO_NOTHING, db_column='secondary_user_ID',  related_name="secondary")  # Field name made lowercase.
+    rapport = models.IntegerField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'h_rapport'
 
 
 ##################################################################

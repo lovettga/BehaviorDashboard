@@ -18,11 +18,15 @@
     <script type="text/javascript">
         google.charts.load('current', {'packages':['corechart']});
         google.charts.load('current', {'packages':['sankey']});
+        google.charts.load('current', {'packages':['gauge']});
 
         google.charts.setOnLoadCallback(talkChart);
         google.charts.setOnLoadCallback(overlapChart);
         google.charts.setOnLoadCallback(backChart);
         google.charts.setOnLoadCallback(interactionChart);
+        google.charts.setOnLoadCallback(emotionChart);
+
+        google.charts.setOnLoadCallback(drawChart);
   
         //talk chart
         function talkChart() {
@@ -89,7 +93,7 @@
                 fontName: 'Times New Roman',
                 legend: 'none',
                 backgroundColor: '#f1f1f1',
-                fontSize: '{{bar_options.3}}',
+                fontSize: '12',
 
                 tooltip: {trigger: '{{bar_options.2}}'}
             };
@@ -105,7 +109,7 @@
 
             var data = google.visualization.arrayToDataTable([
                 ['Participant', 'Talk Time', { role: 'style' } ],
-                {% for group in back_data %}
+                {% for group in backchannel_data %}
                     ['{{ group.0 }}', {{ group.1 }}, 'color: {{group.2}}'],
                 {% endfor %}
             ]);
@@ -129,7 +133,7 @@
                 fontName: 'Times New Roman',
                 legend: 'none',
                 backgroundColor: '#f1f1f1',
-                fontSize: '{{bar_options.3}}',
+                fontSize: '12',
 
                 tooltip: {trigger: '{{bar_options.2}}'}
             };
@@ -140,23 +144,78 @@
             chart.draw(data, options);
         }
 
+        function drawChart() {
+        var data = new google.visualization.DataTable();
+        data.addColumn('string', 'From');
+        data.addColumn('string', 'To');
+        data.addColumn('number', 'Weight');
+        data.addRows([
+            {% for each in interaction_data%}
+                ['{{each.0}}', '{{each.1}}', {{each.2}}],
+            {% endfor %}
+        //['Person 1', 'Person 2', 6], ['Person 1', 'Person 3', 2], ['Person 1', 'Person 4', 8], ['Person 1', 'Person 5', 1]
+
+        ]);
+
+        var colors = [
+            {% for each_color in user_colors%}
+                '{{each_color.1}}',
+            {% endfor %}
+            // '#006992', '#bc4b51', '#eca400', '#5b8e7d', '#784c9f'
+        ] ;
+
+        // Sets chart options.
+        var options = {
+                tooltip: {
+                    trigger: 'selection',
+                    textStyle: {
+                        color: '#000',
+                        fontName: 'Times New Roman',
+                        fontSize: '11',
+                    }
+                    //isHtml: '{{sankey_options.0}}',
+                    
+                },
+                sankey: {
+                    node: {
+                        colors: colors,
+                        label: { 
+                            color: 'transparent',
+                        },
+                        interactivity: false,
+                    },
+                    link: {
+                        colorMode: 'target',
+                        color: { fill: '#d799ae', fillOpacity: 0.9 },
+                    }
+                } 
+            };
+
+        // Instantiates and draws our chart, passing in some options.
+        var chart = new google.visualization.Sankey(document.getElementById('sankey_basic'));
+        chart.draw(data, options);
+      }
+
         
         //interactions chart
         //Sankey Chart
         function interactionChart() {
 
             var data = google.visualization.arrayToDataTable([
-                ['Participant', 'Participant', 'Interactions'],
+                //['Participant', 'Participant', 'Interactions'],
+
+                ['Person 1', 'Person 2', 6], ['Person 1', 'Person 3', 2], ['Person 1', 'Person 4', 8], ['Person 1', 'Person 5', 1]
                 //{% for group in interaction_data %}
                     //['Person 1', 'Person 2', 5]
+                    //['{{ group.0 }}', '{{ group.1 }}', {{ group.2 }}],
                     
-                    {% if group.2 == 0 %}
-                        ['{{ group.0 }}', '{{ group.1 }}', 1],
-                    {% else %}
-                        ['{{ group.0 }}', '{{ group.1 }}', {{ group.2 }}],
-                    {% endif %}
+                    //{% if group.2 == 0 %}
+                    //    ['{{ group.0 }}', '{{ group.1 }}', 1],
+                    //{% else %}
+                    //    ['{{ group.0 }}', '{{ group.1 }}', {{ group.2 }}],
+                    //{% endif %}
                     
-                {% endfor %}
+                //{% endfor %}
             ]);
 
 
@@ -168,9 +227,9 @@
                     textStyle: {
                         color: '#000',
                         fontName: 'Times New Roman',
-                        fontSize: '{{sankey_options.1}}',
-                    },
-                    isHtml: '{{sankey_options.0}}',
+                        fontSize: '11',
+                    }
+                    //isHtml: '{{sankey_options.0}}',
                     
                 },
                 sankey: {
@@ -193,45 +252,105 @@
                 document.getElementById('interactionchart'));
             chart.draw(data, options);
 
-            }
-    </script>
+        }
+        
+        //emotion chart
+        function emotionChart(){
 
-    <!-- Emotion Tooltip -->
-    <style>
-        .tooltip {
-          position: relative;
-          display: inline-block;
-          border-bottom: 1px dotted black;
+            var data = google.visualization.arrayToDataTable([
+                ['Label', 'Value'],
+                ['', {{emotion_data}}]
+            ]);
+
+            var options = {
+                backgroundColor: '#f1f1f1',
+                legend: 'none',
+                fontName: 'Times New Roman',
+                redFrom: 0, redTo: 15,
+                yellowFrom:70, yellowTo: 100,
+                minorTicks: 5
+            };
+
+            var chart = new google.visualization.Gauge(document.getElementById('emotionchart'));
+
+            chart.draw(data, options);
+
         }
-        
-        .tooltip .tooltiptext {
-          visibility: hidden;
-          width: 120px;
-          background-color: black;
-          color: #fff;
-          text-align: center;
-          border-radius: 6px;
-          padding: 5px 0;
-        
-          /* Position the tooltip */
-          position: absolute;
-          z-index: 1;
-        }
-        
-        .tooltip:hover .tooltiptext {
-          visibility: visible;
-        }
-    </style>
+
+        </script>
+
+        <!-- Gauge Chart Styling stuff -->
+        <style>
+            /* Outer-ring */
+            #emotionchart circle:nth-child(1) {
+            stroke-width: 5;
+            stroke: #999;
+            fill: #f1f1f1;
+            }
+
+            /* Main background */
+            #emotionchart circle:nth-child(2) {
+            fill: #f1f1f1;
+            stroke: #ccc;
+            stroke-width: 5;
+            }
+
+            /* Circle of the pointer */
+            #emotionchart circle:nth-child(3) {
+            fill: #222222;
+            stroke: #222222;
+            stroke-width: 3px;
+            }
+
+            /* Main text of the gauge */
+            #emotionchart text {
+            fill: black;
+            font-family: 'Times New Roman';
+            }
+
+            /* Current value text */
+            #emotionchart text:nth-child(1) {
+            fill: transparent;
+            font-size: 33;
+            font-weight: 700;
+            font-family: 'Times New Roman';
+            }
+
+            /* Ticks */
+            #emotionchart path {
+            stroke: #535353;
+            }
+
+            /* Circle */
+            #emotionchart path:nth-child(2) {
+            fill: #222222;
+            stroke: #222222;
+            stroke-width: 2px;
+            fill-opacity: 1;
+            }
+
+            /* Warning area */
+            #emotionchart path:nth-child(3) {
+            fill: #5a915a;
+            }
+
+            /* Danger area */
+            #emotionchart path:nth-child(4) {
+            fill: #833333;
+            }
+        </style>
+
 
 
 </head>
 <body style="font-family: 'Times New Roman'">
-    <!-- Sankey tooltip -->
+    <!-- Sankey tooltip 
     {% if info == '0' %}
         <style>div.google-visualization-tooltip {display: none;}</style>
     {% else %}
         <style>div.google-visualization-tooltip {display: block; margin-left: 40px; width: 130px;}</style>
     {% endif %}
+-->
 
 
     <!-- TOP BAR -->
@@ -255,32 +374,31 @@
                         <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
 
                             Text:
-                            <a class="dropdown-item" href="{% url 'scratch' meeting_id=meeting_object.id user_id=user_profile.id layout=layout size=size info=0 %}">No text / </a>
-                            <a class="dropdown-item" href="{% url 'scratch' meeting_id=meeting_object.id user_id=user_profile.id layout=layout size=size info=1 %}">/ Text / </a>
-                            <a class="dropdown-item" href="{% url 'scratch' meeting_id=meeting_object.id user_id=user_profile.id layout=layout size=size info=2 %}">/ Large Text</a>
+                            <a class="dropdown-item" href="{% url 'scratch' user_id=user_profile.user_id layout=layout size=size info=0 %}">No text / </a>
+                            <a class="dropdown-item" href="{% url 'scratch' user_id=user_profile.user_id layout=layout size=size info=1 %}">/ Text / </a>
+                            <a class="dropdown-item" href="{% url 'scratch' user_id=user_profile.user_id layout=layout size=size info=2 %}">/ Large Text</a>
                             <div class="dropdown-divider"></div>
                             Size:
-                            <a class="dropdown-item" href="{% url 'scratch' meeting_id=meeting_object.id user_id=user_profile.id layout=layout size=0 info=info %}">Small /</a>
-                            <a class="dropdown-item" href="{% url 'scratch' meeting_id=meeting_object.id user_id=user_profile.id layout=layout size=1 info=info %}">/ Large</a>
+                            <a class="dropdown-item" href="{% url 'scratch' user_id=user_profile.user_id layout=layout size=0 info=info %}">Small /</a>
+                            <a class="dropdown-item" href="{% url 'scratch' user_id=user_profile.user_id layout=layout size=1 info=info %}">/ Large</a>
                             <div class="dropdown-divider"></div>
                             Layout:
-                            <a class="dropdown-item" href="{% url 'scratch' meeting_id=meeting_object.id user_id=user_profile.id layout=0 size=size info=info %}">Split /</a>
-                            <a class="dropdown-item" href="{% url 'scratch' meeting_id=meeting_object.id user_id=user_profile.id layout=1 size=size info=info %}">/ Top Bar /</a>
-                            <a class="dropdown-item" href="{% url 'scratch' meeting_id=meeting_object.id user_id=user_profile.id layout=2 size=size info=info %}">/ Side 1 /</a>
-                            <a class="dropdown-item" href="{% url 'scratch' meeting_id=meeting_object.id user_id=user_profile.id layout=3 size=size info=info %}">/ Side 2</a>
+                            <a class="dropdown-item" href="{% url 'scratch' user_id=user_profile.user_id layout=0 size=size info=info %}">Split /</a>
+                            <a class="dropdown-item" href="{% url 'scratch' user_id=user_profile.user_id layout=1 size=size info=info %}">/ Top Bar /</a>
+                            <a class="dropdown-item" href="{% url 'scratch' user_id=user_profile.user_id layout=2 size=size info=info %}">/ Side 1 /</a>
+                            <a class="dropdown-item" href="{% url 'scratch' user_id=user_profile.user_id layout=3 size=size info=info %}">/ Side 2</a>
                             <div class="dropdown-divider"></div>
                             Color:
-                            <a class="dropdown-item" href="{% url 'scratch' meeting_id=meeting_object.id user_id=user_profile.id layout=layout size=size info=info %}">Default /</a>
-                            <a class="dropdown-item" href="{% url 'access' meeting_id=meeting_object.id user_id=user_profile.id layout=layout size=size info=info %}">/ Colorblind</a>
+                            <a class="dropdown-item" href="{% url 'scratch' user_id=user_profile.user_id layout=layout size=size info=info %}">Default /</a>
 
                         </div>
                     </div>
                     {% if info == '2' %}
-                        <p style="font-size: 16px;">Hello {{user_profile.first_name}}!</p>
-                        <p style="font-size: 16px;">Meeting: {{meeting_object.title}}</p>
+                        <p style="font-size: 16px;">Hello {{user_profile.username}}!</p>
+                        <!--<p style="font-size: 16px;">Meeting: {{meeting_object.title}}</p>-->
                     {% else %}
-                        <p>Hello {{user_profile.first_name}}!</p>
-                        <p>Meeting: {{meeting_object.title}}</p>
+                        <p>Hello {{user_profile.username}}!</p>
+                        <!--<p>Meeting: {{meeting_object.title}}</p>-->
                     {% endif %}
                     <!--##########-->
                 </div>
@@ -342,29 +460,22 @@
                         <p class="text-center">Attentiveness</p>
                     {% endif %}
                     {% if size == '1' %}
-                        <div class="progress justify-content-center" style="height: 20px; width: 90%; border-radius: 5px !important; background-color: white !important; box-shadow: inset 0 0 0 1.5px {{all_colors.0}} !important;">
-                            <div class="progress-bar bg-success" role="progressbar" style="width: {{emotion_level}}%; background-color: {{all_colors.0}};" aria-valuenow="{{emotion_level}}" aria-valuemin="0" aria-valuemax="100"></div>
-                        </div>
+                        <div id="emotionchart" style="width: 100%; height: 120px;"></div>
                     {% else %}
-                        <div class="progress justify-content-center" style="height: 15px; width: 100px; border-radius: 5px !important; background-color: white !important; box-shadow: inset 0 0 0 1.5px {{all_colors.0}} !important;">
-                            <div class="progress-bar bg-success" role="progressbar" style="width: {{emotion_level}}%; background-color: {{all_colors.0}};" aria-valuenow="{{emotion_level}}" aria-valuemin="0" aria-valuemax="100"></div>
-                        </div>
+                        <div id="emotionchart" style="width: 100%; height: 120px;"></div>
                     {% endif %}
 
                     
-                    {% if participant_num > 2 %}
+                    
                     {% if info == '2' %}
                         <p class="text-center" style="font-size: 18px;">Interactions</p>
                     {% else %}
                         <p class="text-center">Interactions</p>
                     {% endif %}
-                        {% if size == '1' %}
-                            <div id="interactionchart" style="width: 90%; height: 100px; margin-top: 15%;"></div>
-                        {%else%}
-                            <div id="interactionchart" style="width: 70%; height: 85px; margin-top: 15%;"></div>
-                        {% endif %}
-                    {% else %}
-                        &nbsp;
+                    {% if size == '1' %}
+                        <div id="sankey_basic" style="width: 90%; height: 100px; margin-top: 15%;"></div>
+                    {%else%}
+                        <div id="sankey_basic" style="width: 70%; height: 85px; margin-top: 15%;"></div>
                     {% endif %}
 
                 </div>
@@ -394,32 +505,31 @@
                         <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
 
                             Text:
-                            <a class="dropdown-item" href="{% url 'scratch' meeting_id=meeting_object.id user_id=user_profile.id layout=layout size=size info=0 %}">No text / </a>
-                            <a class="dropdown-item" href="{% url 'scratch' meeting_id=meeting_object.id user_id=user_profile.id layout=layout size=size info=1 %}">/ Text / </a>
-                            <a class="dropdown-item" href="{% url 'scratch' meeting_id=meeting_object.id user_id=user_profile.id layout=layout size=size info=2 %}">/ Large Text</a>
+                            <a class="dropdown-item" href="{% url 'scratch' user_id=user_profile.user_id layout=layout size=size info=0 %}">No text / </a>
+                            <a class="dropdown-item" href="{% url 'scratch' user_id=user_profile.user_id layout=layout size=size info=1 %}">/ Text / </a>
+                            <a class="dropdown-item" href="{% url 'scratch' user_id=user_profile.user_id layout=layout size=size info=2 %}">/ Large Text</a>
                             <div class="dropdown-divider"></div>
                             Size:
-                            <a class="dropdown-item" href="{% url 'scratch' meeting_id=meeting_object.id user_id=user_profile.id layout=layout size=0 info=info %}">Small /</a>
-                            <a class="dropdown-item" href="{% url 'scratch' meeting_id=meeting_object.id user_id=user_profile.id layout=layout size=1 info=info %}">/ Large</a>
+                            <a class="dropdown-item" href="{% url 'scratch' user_id=user_profile.user_id layout=layout size=0 info=info %}">Small /</a>
+                            <a class="dropdown-item" href="{% url 'scratch' user_id=user_profile.user_id layout=layout size=1 info=info %}">/ Large</a>
                             <div class="dropdown-divider"></div>
                             Layout:
-                            <a class="dropdown-item" href="{% url 'scratch' meeting_id=meeting_object.id user_id=user_profile.id layout=0 size=size info=info %}">Split /</a>
-                            <a class="dropdown-item" href="{% url 'scratch' meeting_id=meeting_object.id user_id=user_profile.id layout=1 size=size info=info %}">/ Top Bar /</a>
-                            <a class="dropdown-item" href="{% url 'scratch' meeting_id=meeting_object.id user_id=user_profile.id layout=2 size=size info=info %}">/ Side 1 /</a>
-                            <a class="dropdown-item" href="{% url 'scratch' meeting_id=meeting_object.id user_id=user_profile.id layout=3 size=size info=info %}">/ Side 2</a>
+                            <a class="dropdown-item" href="{% url 'scratch' user_id=user_profile.user_id layout=0 size=size info=info %}">Split /</a>
+                            <a class="dropdown-item" href="{% url 'scratch' user_id=user_profile.user_id layout=1 size=size info=info %}">/ Top Bar /</a>
+                            <a class="dropdown-item" href="{% url 'scratch' user_id=user_profile.user_id layout=2 size=size info=info %}">/ Side 1 /</a>
+                            <a class="dropdown-item" href="{% url 'scratch' user_id=user_profile.user_id layout=3 size=size info=info %}">/ Side 2</a>
                             <div class="dropdown-divider"></div>
                             Color:
-                            <a class="dropdown-item" href="{% url 'scratch' meeting_id=meeting_object.id user_id=user_profile.id layout=layout size=size info=info %}">Default /</a>
-                            <a class="dropdown-item" href="{% url 'access' meeting_id=meeting_object.id user_id=user_profile.id layout=layout size=size info=info %}">/ Colorblind</a>
+                            <a class="dropdown-item" href="{% url 'scratch' user_id=user_profile.user_id layout=layout size=size info=info %}">Default /</a>
 
                         </div>
                     </div>
                     {% if info == '2' %}
-                        <p style="font-size: 16px;">Hello {{user_profile.first_name}}!</p>
-                        <p style="font-size: 16px;">Meeting: {{meeting_object.title}}</p>
+                        <p style="font-size: 16px;">Hello {{user_profile.username}}!</p>
+                        <!--<p style="font-size: 16px;">Meeting: {{meeting_object.title}}</p>-->
                     {% else %}
-                        <p>Hello {{user_profile.first_name}}!</p>
-                        <p>Meeting: {{meeting_object.title}}</p>
+                        <p>Hello {{user_profile.username}}!</p>
+                        <!--<p>Meeting: {{meeting_object.title}}</p>-->
                     {% endif %}
                     <!--##########-->
 
@@ -452,13 +562,9 @@
                         <p class="text-center">Attentiveness</p>
                     {% endif %}
                     {% if size == '1' %}
-                        <div class="progress justify-content-center" style="height: 20px; width: 90%;">
-                            <div class="progress-bar bg-success" role="progressbar" style="width: {{emotion_level}}%; background-color: {{all_colors.0}};" aria-valuenow="{{emotion_level}}" aria-valuemin="0" aria-valuemax="100"></div>
-                        </div>
+                        <div id="emotionchart" style="width: 100%; height: 120px;"></div>
                     {% else %}
-                        <div class="progress justify-content-center" style="height: 15px; width: 100px;">
-                            <div class="progress-bar bg-success" role="progressbar" style="width: {{emotion_level}}%; background-color: {{all_colors.0}};" aria-valuenow="{{emotion_level}}" aria-valuemin="0" aria-valuemax="100"></div>
-                        </div>
+                        <div id="emotionchart" style="width: 100%; height: 120px;"></div>
                     {% endif %}
 
 
@@ -494,19 +600,16 @@
                     {% endif %}
 
                     <br>
-                    {% if participant_num > 2 %}
+                    
                     {% if info == '2' %}
                         <p class="text-center" style="font-size: 18px;">Interactions</p>
                     {% else %}
                         <p class="text-center">Interactions</p>
                     {% endif %}
-                        {% if size == '1' %}
-                            <div id="interactionchart" style="width: 90%; height: 100px; margin-top: 15%;"></div>
-                        {%else%}
-                            <div id="interactionchart" style="width: 70%; height: 85px; margin-top: 15%;"></div>
-                        {% endif %}
-                    {% else %}
-                        &nbsp;
+                    {% if size == '1' %}
+                        <div id="sankey_basic" style="width: 90%; height: 100px; margin-top: 15%;"></div>
+                    {%else%}
+                        <div id="sankey_basic" style="width: 70%; height: 85px; margin-top: 15%;"></div>
                     {% endif %}
 
                 </div>
@@ -536,32 +639,31 @@
                         <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
 
                             Text:
-                            <a class="dropdown-item" href="{% url 'scratch' meeting_id=meeting_object.id user_id=user_profile.id layout=layout size=size info=0 %}">No text / </a>
-                            <a class="dropdown-item" href="{% url 'scratch' meeting_id=meeting_object.id user_id=user_profile.id layout=layout size=size info=1 %}">/ Text / </a>
-                            <a class="dropdown-item" href="{% url 'scratch' meeting_id=meeting_object.id user_id=user_profile.id layout=layout size=size info=2 %}">/ Large Text</a>
+                            <a class="dropdown-item" href="{% url 'scratch' user_id=user_profile.user_id layout=layout size=size info=0 %}">No text / </a>
+                            <a class="dropdown-item" href="{% url 'scratch' user_id=user_profile.user_id layout=layout size=size info=1 %}">/ Text / </a>
+                            <a class="dropdown-item" href="{% url 'scratch' user_id=user_profile.user_id layout=layout size=size info=2 %}">/ Large Text</a>
                             <div class="dropdown-divider"></div>
                             Size:
-                            <a class="dropdown-item" href="{% url 'scratch' meeting_id=meeting_object.id user_id=user_profile.id layout=layout size=0 info=info %}">Small /</a>
-                            <a class="dropdown-item" href="{% url 'scratch' meeting_id=meeting_object.id user_id=user_profile.id layout=layout size=1 info=info %}">/ Large</a>
+                            <a class="dropdown-item" href="{% url 'scratch' user_id=user_profile.user_id layout=layout size=0 info=info %}">Small /</a>
+                            <a class="dropdown-item" href="{% url 'scratch' user_id=user_profile.user_id layout=layout size=1 info=info %}">/ Large</a>
                             <div class="dropdown-divider"></div>
                             Layout:
-                            <a class="dropdown-item" href="{% url 'scratch' meeting_id=meeting_object.id user_id=user_profile.id layout=0 size=size info=info %}">Split /</a>
-                            <a class="dropdown-item" href="{% url 'scratch' meeting_id=meeting_object.id user_id=user_profile.id layout=1 size=size info=info %}">/ Top Bar /</a>
-                            <a class="dropdown-item" href="{% url 'scratch' meeting_id=meeting_object.id user_id=user_profile.id layout=2 size=size info=info %}">/ Side 1 /</a>
-                            <a class="dropdown-item" href="{% url 'scratch' meeting_id=meeting_object.id user_id=user_profile.id layout=3 size=size info=info %}">/ Side 2</a>
+                            <a class="dropdown-item" href="{% url 'scratch' user_id=user_profile.user_id layout=0 size=size info=info %}">Split /</a>
+                            <a class="dropdown-item" href="{% url 'scratch' user_id=user_profile.user_id layout=1 size=size info=info %}">/ Top Bar /</a>
+                            <a class="dropdown-item" href="{% url 'scratch' user_id=user_profile.user_id layout=2 size=size info=info %}">/ Side 1 /</a>
+                            <a class="dropdown-item" href="{% url 'scratch' user_id=user_profile.user_id layout=3 size=size info=info %}">/ Side 2</a>
                             <div class="dropdown-divider"></div>
                             Color:
-                            <a class="dropdown-item" href="{% url 'scratch' meeting_id=meeting_object.id user_id=user_profile.id layout=layout size=size info=info %}">Default /</a>
-                            <a class="dropdown-item" href="{% url 'access' meeting_id=meeting_object.id user_id=user_profile.id layout=layout size=size info=info %}">/ Colorblind</a>
+                            <a class="dropdown-item" href="{% url 'scratch' user_id=user_profile.user_id layout=layout size=size info=info %}">Default /</a>
 
                         </div>
                     </div>
                     {% if info == '2' %}
-                        <p style="font-size: 16px;">Hello {{user_profile.first_name}}!</p>
-                        <p style="font-size: 16px;">Meeting: {{meeting_object.title}}</p>
+                        <p style="font-size: 16px;">Hello {{user_profile.username}}!</p>
+                        <!--<p style="font-size: 16px;">Meeting: {{meeting_object.title}}</p>-->
                     {% else %}
-                        <p>Hello {{user_profile.first_name}}!</p>
-                        <p>Meeting: {{meeting_object.title}}</p>
+                        <p>Hello {{user_profile.username}}!</p>
+                        <!--<p>Meeting: {{meeting_object.title}}</p>-->
                     {% endif %}
                     <!--##########-->
 
@@ -594,13 +696,9 @@
                         <p class="text-center">Attentiveness</p>
                     {% endif %}
                     {% if size == '1' %}
-                        <div class="progress justify-content-center" style="height: 20px; width: 90%;">
-                            <div class="progress-bar bg-success" role="progressbar" style="width: {{emotion_level}}%; background-color: {{all_colors.0}};" aria-valuenow="{{emotion_level}}" aria-valuemin="0" aria-valuemax="100"></div>
-                        </div>
+                        <div id="emotionchart" style="width: 100%; height: 120px;"></div>
                     {% else %}
-                        <div class="progress justify-content-center" style="height: 15px; width: 100px;">
-                            <div class="progress-bar bg-success" role="progressbar" style="width: {{emotion_level}}%; background-color: {{all_colors.0}};" aria-valuenow="{{emotion_level}}" aria-valuemin="0" aria-valuemax="100"></div>
-                        </div>
+                        <div id="emotionchart" style="width: 100%; height: 120px;"></div>
                     {% endif %}
 
                     <!--#############-->
@@ -631,19 +729,16 @@
                     {% endif %}
 
                     <br>
-                    {% if participant_num > 2 %}
+                    
                     {% if info == '2' %}
                         <p class="text-center" style="font-size: 18px;">Interactions</p>
                     {% else %}
                         <p class="text-center">Interactions</p>
                     {% endif %}
-                        {% if size == '1' %}
-                            <div id="interactionchart" style="width: 90%; height: 100px; margin-top: 15%;"></div>
-                        {%else%}
-                            <div id="interactionchart" style="width: 70%; height: 85px; margin-top: 15%;"></div>
-                        {% endif %}
-                    {% else %}
-                        &nbsp;
+                    {% if size == '1' %}
+                        <div id="sankey_basic" style="width: 90%; height: 100px; margin-top: 15%;"></div>
+                    {%else%}
+                        <div id="sankey_basic" style="width: 70%; height: 85px; margin-top: 15%;"></div>
                     {% endif %}
 
                 </div>
@@ -671,35 +766,34 @@
                         <div class="dropdown-menu" aria-labelledby="dropdownMenuLink" style="font-size: {{settings_font}}px; padding: 5px;">
         
                             Text:
-                            <a class="dropdown-item" href="{% url 'scratch' meeting_id=meeting_object.id user_id=user_profile.id layout=layout size=size info=0 %}">No text / </a>
-                            <a class="dropdown-item" href="{% url 'scratch' meeting_id=meeting_object.id user_id=user_profile.id layout=layout size=size info=1 %}">/ Text / </a>
-                            <a class="dropdown-item" href="{% url 'scratch' meeting_id=meeting_object.id user_id=user_profile.id layout=layout size=size info=2 %}">/ Large Text</a>
+                            <a class="dropdown-item" href="{% url 'scratch' user_id=user_profile.user_id layout=layout size=size info=0 %}">No text / </a>
+                            <a class="dropdown-item" href="{% url 'scratch' user_id=user_profile.user_id layout=layout size=size info=1 %}">/ Text / </a>
+                            <a class="dropdown-item" href="{% url 'scratch' user_id=user_profile.user_id layout=layout size=size info=2 %}">/ Large Text</a>
                             <div class="dropdown-divider"></div>
                             Size:
-                            <a class="dropdown-item" href="{% url 'scratch' meeting_id=meeting_object.id user_id=user_profile.id layout=layout size=0 info=info %}">Small /</a>
-                            <a class="dropdown-item" href="{% url 'scratch' meeting_id=meeting_object.id user_id=user_profile.id layout=layout size=1 info=info %}">/ Large</a>
+                            <a class="dropdown-item" href="{% url 'scratch' user_id=user_profile.user_id layout=layout size=0 info=info %}">Small /</a>
+                            <a class="dropdown-item" href="{% url 'scratch' user_id=user_profile.user_id layout=layout size=1 info=info %}">/ Large</a>
                             <div class="dropdown-divider"></div>
                             Layout:
-                            <a class="dropdown-item" href="{% url 'scratch' meeting_id=meeting_object.id user_id=user_profile.id layout=0 size=size info=info %}">Split /</a>
-                            <a class="dropdown-item" href="{% url 'scratch' meeting_id=meeting_object.id user_id=user_profile.id layout=1 size=size info=info %}">/ Top Bar /</a>
-                            <a class="dropdown-item" href="{% url 'scratch' meeting_id=meeting_object.id user_id=user_profile.id layout=2 size=size info=info %}">/ Side 1 /</a>
-                            <a class="dropdown-item" href="{% url 'scratch' meeting_id=meeting_object.id user_id=user_profile.id layout=3 size=size info=info %}">/ Side 2</a>
+                            <a class="dropdown-item" href="{% url 'scratch' user_id=user_profile.user_id layout=0 size=size info=info %}">Split /</a>
+                            <a class="dropdown-item" href="{% url 'scratch' user_id=user_profile.user_id layout=1 size=size info=info %}">/ Top Bar /</a>
+                            <a class="dropdown-item" href="{% url 'scratch' user_id=user_profile.user_id layout=2 size=size info=info %}">/ Side 1 /</a>
+                            <a class="dropdown-item" href="{% url 'scratch' user_id=user_profile.user_id layout=3 size=size info=info %}">/ Side 2</a>
                             <div class="dropdown-divider"></div>
                             Color:
-                            <a class="dropdown-item" href="{% url 'scratch' meeting_id=meeting_object.id user_id=user_profile.id layout=layout size=size info=info %}">Default /</a>
-                            <a class="dropdown-item" href="{% url 'access' meeting_id=meeting_object.id user_id=user_profile.id layout=layout size=size info=info %}">/ Colorblind</a>
+                            <a class="dropdown-item" href="{% url 'scratch' user_id=user_profile.user_id layout=layout size=size info=info %}">Default /</a>
 
                         </div>
                     </div>
                     {% if info == '2' %}
-                        <p style="font-size: 16px;">Hello {{user_profile.first_name}}!</p>
-                        <p style="font-size: 16px;">Meeting: {{meeting_object.title}}</p>
+                        <p style="font-size: 16px;">Hello {{user_profile.username}}!</p>
+                        <!--<p style="font-size: 16px;">Meeting: {{meeting_object.title}}</p>-->
                     {% else %}
-                        <p>Hello {{user_profile.first_name}}!</p>
-                        <p>Meeting: {{meeting_object.title}}</p>
+                        <p>Hello {{user_profile.username}}!</p>
+                        <!--<p>Meeting: {{meeting_object.title}}</p>-->
                     {% endif %}
                     
-                    <!--RIGHT SIDE CHARTS-->
+                    <!--LEFT SIDE CHARTS-->
                     <br>
                     {% if info == '2' %}
                         <p class="text-center" style="font-size: 17px;">Participants</p>
@@ -717,31 +811,25 @@
                         <p class="text-center">Attentiveness</p>
                     {% endif %}
                     {% if size == '1' %}
-                        <div class="progress justify-content-center" style="height: 20px; width: 90%;">
-                            <div class="progress-bar bg-success" role="progressbar" style="width: {{emotion_level}}%; background-color: {{all_colors.0}};" aria-valuenow="{{emotion_level}}" aria-valuemin="0" aria-valuemax="100"></div>
-                        </div>
+                        <div id="emotionchart" style="width: 100%; height: 120px;"></div>
                     {% else %}
-                        <div class="progress justify-content-center" style="height: 15px; width: 100px;">
-                            <div class="progress-bar bg-success" role="progressbar" style="width: {{emotion_level}}%; background-color: {{all_colors.0}};" aria-valuenow="{{emotion_level}}" aria-valuemin="0" aria-valuemax="100"></div>
-                        </div>
+                        <div id="emotionchart" style="width: 100%; height: 120px;"></div>
                     {% endif %}
 
                     <br>
 
-                    {% if participant_num > 2 %}
+                    
                     {% if info == '2' %}
                         <p class="text-center" style="font-size: 18px;">Interactions</p>
                     {% else %}
                         <p class="text-center">Interactions</p>
                     {% endif %}
-                        {% if size == '1' %}
-                            <div id="interactionchart" style="width: 90%; height: 100px; margin-top: 15%;"></div>
-                        {%else%}
-                            <div id="interactionchart" style="width: 70%; height: 85px; margin-top: 15%;"></div>
-                        {% endif %}
-                    {% else %}
-                        &nbsp;
+                    {% if size == '1' %}
+                        <div id="sankey_basic" style="width: 90%; height: 100px; margin-top: 15%;"></div>
+                    {%else%}
+                        <div id="sankey_basic" style="width: 70%; height: 85px; margin-top: 15%;"></div>
                     {% endif %}
+                    
 
                 </div>
 

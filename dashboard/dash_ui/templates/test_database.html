@@ -27,6 +27,7 @@
 
       google.charts.setOnLoadCallback(talkChart);
       google.charts.setOnLoadCallback(overlapChart);
+      google.charts.setOnLoadCallback(backchannelChart);
       google.charts.setOnLoadCallback(emotionChart);
 
       //talk chart
@@ -34,7 +35,7 @@
 
           var data = google.visualization.arrayToDataTable([
               ['Participant', 'Talking Time'],
-              {% for pair in cond_talk_data %}
+              {% for pair in talk_data %}
                   ['{{ pair.0 }}', {{ pair.1 }}],
               {% endfor %}
           ]);
@@ -69,7 +70,7 @@
     function overlapChart() {
 
         var data = google.visualization.arrayToDataTable([
-            ['Participant', 'Talk Time', { role: 'style' } ],
+            ['Participant', 'Overlaps', { role: 'style' } ],
             {% for group in overlap_data %}
                 ['{{ group.0 }}', {{ group.1 }}, 'color: {{group.2}}'],
             {% endfor %}
@@ -105,13 +106,52 @@
         chart.draw(data, options);
     }
 
+    //backchannel chart
+    function backchannelChart() {
+
+        var data = google.visualization.arrayToDataTable([
+            ['Participant', 'Backchannels', { role: 'style' } ],
+            {% for group in backchannel_data %}
+                ['{{ group.0 }}', {{ group.1 }}, 'color: {{group.2}}'],
+            {% endfor %}
+        ]);
+
+
+        var options = {
+            hAxis: {
+                title: 'Participants',
+                textStyle: { color: 'transparent'},
+                gridlines: { color: '{{bar_options.0}}'},
+                textPosition: '{{bar_options.1}}',
+                titleTextStyle: {color: '{{bar_options.4}}'}
+            },
+            vAxis: {
+                title: 'Overlaps',
+                format: 'decimal',
+                gridlines: { color: '{{bar_options.0}}'},
+                textPosition: '{{bar_options.1}}',
+                titleTextStyle: {color: '{{bar_options.4}}'}
+            },
+            fontName: 'Times New Roman',
+            legend: 'none',
+            backgroundColor: '#f1f1f1',
+            fontSize: '{{bar_options.3}}',
+
+            tooltip: {trigger: '{{bar_options.2}}'}
+        };
+
+        var chart = new google.visualization.ColumnChart(
+        document.getElementById('backchannelchart'));
+
+        chart.draw(data, options);
+    }
 
     //emotion chart
     function emotionChart(){
 
         var data = google.visualization.arrayToDataTable([
             ['Label', 'Value'],
-            ['', 80]
+            ['', {{emotion_data}}]
         ]);
 
         var options = {
@@ -198,34 +238,39 @@
     <h3 style="margin-left: 5px;">Testing the mySQL database</h3>
 
 
-<!--
-    <div class="container" style="padding-top: 2%;">
+
+    <div class="container" style="padding-top: 2%; width: 95%;">
         <div class="row" style="background: #f1f1f1; height: 250px;">
-            <div class="col-sm-2" style="background: #f1f1f1; width: 35%;" align="center">
+            <div class="col-sm-2" style="background: #f1f1f1; width: 20%;" align="center">
                 <br>
-                <div id="talkchart" style="width: 95%; height: 200px;"></div>
+                <div id="talkchart" style="width: 100%; height: 200px;"></div>
             </div>
             
-            <div class="col-sm-2" style="background: #f1f1f1; width: 25%;" align="center">
+            <div class="col-sm-2" style="background: #f1f1f1; width: 20%;" align="center">
                 <br>
                 <div id="overlapchart" style="width: 100%; height: 120px;"></div>
             </div>
-            <div class="col-sm-2" style="background: #f1f1f1; width: 25%;" align="center">
+            <div class="col-sm-2" style="background: #f1f1f1; width: 20%;" align="center">
                 <br>
-                <div id="emotionchart" style="width: 85%; height: 120px;"></div>
+                <div id="backchannelchart" style="width: 100%; height: 120px;"></div>
+            </div>
+            <div class="col-sm-2" style="background: #f1f1f1; width: 20%;" align="center">
+                <br>
+                <div id="emotionchart" style="width: 100%; height: 120px;"></div>
             </div>
         
         
-            <div class="col-sm-2" style="background: #f1f1f1; width: 35%;" align="center">
+            <div class="col-sm-2" style="background: #f1f1f1; width: 20%;" align="center">
                 <br>
                 <p><strong>All Users</strong></p>
                 {% for each_user in user_colors%}
-                    <p>{{each_user.0}} </p>
+                    <p>{{each_user.0}} <span class="badge" style="background-color: {{each_user.1}}">&nbsp;</span></p>
                 {% endfor %}
             </div>
         
         </div>
     </div>
+
 
     <div class="container">
         <div class="col-sm-2" style="background: #f1f1f1; width: 40%;" align="center">
@@ -238,40 +283,42 @@
                 </tr>
                 </thead>
                 <tbody>
-                    {% for each_data in all_data%}
+                    {% for each_data in talk_stream%}
                     <tr>
                         <td>{{each_data.counter}}</td>
-                        <td>{{each_data.dd_user.username}}</td>
+                        <td>{{each_data.user_id.username}}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
         <div class="col-sm-2" style="background: #f1f1f1; width: 40%;" align="center">
-            <h4 style="margin-left: 30px;">Cond. Talkstream Table</h4>
+            <h4 style="margin-left: 30px;">Display Table Data</h4>
             <table class="table" style="width: 500px;">
                 <thead>
                 <tr>
-                    <th scope="col">Counter</th>
-                    <th scope="col">Name</th>
+                    <th scope="col">User</th>
+                    <th scope="col">Talktime</th>
+                    <th scope="col">Overlaps</th>
+                    <th scope="col">Backchannels</th>
+                    <th scope="col">Emotion</th>
                 </tr>
                 </thead>
                 <tbody>
                     {% for each_data in cond_data%}
                     <tr>
-                        <td>{{each_data.counter}}</td>
-                        <td>{{each_data.dd_con.username}}</td>
+                        <td>{{each.user_id.username}}</td>
+                        <td>{{each.talktime}}</td>
+                        <td>{{each.overlaps}}</td>
+                        <td>{{each.backchannels}}</td>
+                        <td>{{each.emotion}}</td>
+                        
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
     </div>
--->
-    <h4>Display Table</h4>
-    {% for each in display_table%}
-    <br><p>{{each.user_id.username}} - {{each.talktime}} - {{each.overlaps}} - {{each.backchannels}} - {{each.emotion}}</p>
-    {% endfor %}
     
 <!--
     <div class="container">
