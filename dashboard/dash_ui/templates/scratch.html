@@ -2,8 +2,10 @@
 <!DOCTYPE html>
 <html>
 <head>
+        <!-- This HTML page is the primary display at the moment, with many options and uses information from the database -->
 
-    <!-- Bootstrap -->
+
+    <!-- for Bootstrap and other CSS -->
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
     <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
     <link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
@@ -12,28 +14,31 @@
     <!--for Google Charts-->
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 
-
+    <!-- Changing the value in 'content' will change the seconds between display refreshes -->
     <meta http-equiv="refresh" content="5">
 
 
     <!-- Google Charts -->
     <!-- Text Charts -->
     <script type="text/javascript">
+        // Load all the packages for the chart rendering
         google.charts.load('current', {'packages':['corechart']});
         google.charts.load('current', {'packages':['sankey']});
         google.charts.load('current', {'packages':['gauge']});
 
+        // Each chart needs a load call as well
         google.charts.setOnLoadCallback(talkChart);
         google.charts.setOnLoadCallback(overlapChart);
         google.charts.setOnLoadCallback(backChart);
         google.charts.setOnLoadCallback(interactionChart);
         google.charts.setOnLoadCallback(emotionChart);
-
+        // Use this chart for the interaction chart showing (the other interaction chart is bugged)
         google.charts.setOnLoadCallback(drawChart);
   
         //talk chart
         function talkChart() {
-  
+            
+            // Data is put into a Google Table using a for loop to iterate through the talk_data
             var data = google.visualization.arrayToDataTable([
                 ['Participant', 'Talking Time'],
                 {% for pair in talk_data %}
@@ -41,16 +46,19 @@
                 {% endfor %}
             ]);
   
+            // The options below let you change the look of the chart
             var options = {
                 backgroundColor: '#f1f1f1',
                 legend: 'none',
                 fontName: 'Times New Roman',
 
+                // several optinos are determined through pie_options, which allows users to toggle between text and size options
                 chartArea: {width:'{{pie_options.0}}%', height:'{{pie_options.0}}%'},
                 pieSliceText: '{{pie_options.1}}',
                 tooltip: {trigger: '{{pie_options.2}}'},
                 fontSize: '{{pie_options.3}}',
                 
+                // the pie slice colors are determined by all_colors
                 slices: {
                     
                     0: { color: '{{all_colors.0}}' },
@@ -62,6 +70,7 @@
                 }
             };
     
+            // 'talkchart' is the id used in the body HTML to display the chart
             var chart = new google.visualization.PieChart(document.getElementById('talkchart'));
     
             chart.draw(data, options);
@@ -70,6 +79,7 @@
         //overlap chart
         function overlapChart() {
 
+            // Data is put into a Google Table using a for loop to iterate through the overlap_data
             var data = google.visualization.arrayToDataTable([
                 ['Participant', 'Talk Time', { role: 'style' } ],
                 {% for group in overlap_data %}
@@ -77,11 +87,13 @@
                 {% endfor %}
             ]);
 
-
+            // The options below let you change the look of the chart
             var options = {
                 hAxis: {
                     title: 'Participants',
                     textStyle: { color: 'transparent'},
+
+                    // several optinos are determined through pie_options, which allows users to toggle between text and size options
                     gridlines: { color: '{{bar_options.0}}'},
                     textPosition: '{{bar_options.1}}',
                     titleTextStyle: {color: '{{bar_options.4}}'}
@@ -101,6 +113,7 @@
                 tooltip: {trigger: '{{bar_options.2}}'}
             };
 
+            // 'overlapchart' is the id used in the body HTML to display the chart
             var chart = new google.visualization.ColumnChart(
             document.getElementById('overlapchart'));
 
@@ -110,6 +123,7 @@
         //back-channel chart
         function backChart() {
 
+            // backchannel_data is used for this table
             var data = google.visualization.arrayToDataTable([
                 ['Participant', 'Talk Time', { role: 'style' } ],
                 {% for group in backchannel_data %}
@@ -117,11 +131,12 @@
                 {% endfor %}
             ]);
 
-
+            // visual options can be changed
             var options = {
                 hAxis: {
                     title: 'Participants',
                     textStyle: { color: 'transparent'},
+                    // use of bar_options is similar to the overlaps chart above
                     gridlines: { color: '{{bar_options.0}}'},
                     textPosition: '{{bar_options.1}}',
                     titleTextStyle: {color: '{{bar_options.4}}'}
@@ -141,6 +156,7 @@
                 tooltip: {trigger: '{{bar_options.2}}'}
             };
 
+            // 'backchart' is the id used in the HTML body
             var chart = new google.visualization.ColumnChart(
             document.getElementById('backchart'));
 
@@ -150,6 +166,8 @@
         //interactions chart
         //Sankey Chart
         function drawChart() {
+    
+        // interaction_data is used for the rapport chart
         var data = new google.visualization.DataTable();
         data.addColumn('string', 'From');
         data.addColumn('string', 'To');
@@ -158,18 +176,17 @@
             {% for each in interaction_data%}
                 ['{{each.0}}', '{{each.1}}', {{each.2}}],
             {% endfor %}
-        //['Person 1', 'Person 2', 6], ['Person 1', 'Person 3', 2], ['Person 1', 'Person 4', 8], ['Person 1', 'Person 5', 1]
 
         ]);
 
+        // the interaction connections are determined by interaction_colors
         var colors = [
             {% for each_color in interaction_colors%}
                 '{{each_color}}',
             {% endfor %}
-            // '#006992', '#bc4b51', '#eca400', '#5b8e7d', '#784c9f'
         ] ;
 
-        // Sets chart options.
+        // changing these options allows for chart customization
         var options = {
                 tooltip: {
                     trigger: 'selection',
@@ -178,7 +195,6 @@
                         fontName: 'Times New Roman',
                         fontSize: '11',
                     }
-                    //isHtml: '{{sankey_options.0}}',
                     
                 },
                 sankey: {
@@ -196,13 +212,13 @@
                 } 
             };
 
-        // Instantiates and draws our chart, passing in some options.
+        // 'sankey_basic' is the id used by the body HTML
         var chart = new google.visualization.Sankey(document.getElementById('sankey_basic'));
         chart.draw(data, options);
       }
 
         
-        // DOESN'T WORK
+        // DOESN'T WORK -- PLEASE REFER TO THE CHART ABOVE FOR THE RAPPORT CHART
         //interactions chart
         //Sankey Chart
         function interactionChart() {
@@ -260,23 +276,30 @@
 
         }
         
+        // gauge chart
         //emotion chart
         function emotionChart(){
 
+            // emotion_data is the data used for this chart
             var data = google.visualization.arrayToDataTable([
                 ['Label', 'Value'],
                 ['', {{emotion_data}}]
             ]);
 
+            // chart customization options
             var options = {
                 backgroundColor: '#f1f1f1',
                 legend: 'none',
                 fontName: 'Times New Roman',
+                // "red" and "yellow" can be changed into different colors below
+                // Danger area
                 redFrom: 0, redTo: 15,
+                // Warning area
                 yellowFrom:70, yellowTo: 100,
                 minorTicks: 5
             };
 
+            // emotionchart is the id used later in the body HTML
             var chart = new google.visualization.Gauge(document.getElementById('emotionchart'));
 
             chart.draw(data, options);
@@ -285,7 +308,7 @@
 
         </script>
 
-        <!-- Gauge Chart Styling stuff -->
+        <!-- Further Gauge Chart Styling Options -->
         <style>
             /* Outer-ring */
             #emotionchart circle:nth-child(1) {
@@ -335,12 +358,12 @@
             fill-opacity: 1;
             }
 
-            /* Warning area */
+            /* Warning area - Yellow area */
             #emotionchart path:nth-child(3) {
             fill: #5a915a;
             }
 
-            /* Danger area */
+            /* Danger area - Red area */
             #emotionchart path:nth-child(4) {
             fill: #833333;
             }
@@ -365,7 +388,7 @@
             <div class="row" style="background: #f1f1f1; height: 290px;">
                 <div class="col-sm-2" style="background: #f1f1f1; width: 12.5%" align="center">
                     <br>
-                    <!-- Settings -->
+                    <!-- Settings icon and options -->
                     <div class="dropdown show" style="display: inline-block; ">
                         <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <span style="color: black;">
@@ -376,9 +399,9 @@
                                 </svg>
                             </span>
                         </a>
-                    
+                        <!-- settings dropdown -->
                         <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-
+                            <!-- Each option is above the <a></a> with the url's within the href -->
                             Text:
                             <a class="dropdown-item" href="{% url 'scratch' user_id=user_profile.user_id layout=layout size=size info=0 %}">No text / </a>
                             <a class="dropdown-item" href="{% url 'scratch' user_id=user_profile.user_id layout=layout size=size info=1 %}">/ Text / </a>
@@ -399,6 +422,7 @@
 
                         </div>
                     </div>
+                    <!-- different sizings of the username -->
                     {% if info == '2' %}
                         <p style="font-size: 16px;">Hello {{user_profile.username}}!</p>
                         <!--<p style="font-size: 16px;">Meeting: {{meeting_object.title}}</p>-->
@@ -408,6 +432,7 @@
                     {% endif %}
                     <!--##########-->
                 </div>
+                <!-- displays the meeting participants-->
                 <div class="col-sm-2" style="background: #f1f1f1; width: 12.5%;" align="center">
                     <br>
                     {% if info == '2' %}
@@ -419,6 +444,7 @@
                         <div style="font-size: {{pie_options.3}}px;">{{each_user.0}}  <span class="badge" style="background-color: {{each_user.1}}">&nbsp;</span></div>
                     {% endfor %}
                 </div>
+                <!-- displays talk time chart -->
                 <div class="col-sm-2" style="background: #f1f1f1; width: 18.5%;" align="center">
                     <br>
                     {% if info == '2' %}
@@ -432,6 +458,7 @@
                         <div id="talkchart" style="width: 75%; height: 100px;"></div>
                     {% endif %}
                 </div>
+                <!-- displays overlap chart-->
                 <div class="col-sm-2" style="background: #f1f1f1; width: 18.5%;" align="center">
                     <br>
                     {% if info == '2' %}
@@ -445,6 +472,7 @@
                         <div id="overlapchart" style="width: 90%; height: 100px;"></div>
                     {% endif %}
                 </div>
+                <!-- displays back-channels chart -->
                 <div class="col-sm-2" style="background: #f1f1f1; width: 18.5%;" align="center">
                     <br>
                     {% if info == '2' %}
@@ -458,8 +486,10 @@
                         <div id="backchart" style="width: 90%; height: 100px;"></div>
                     {% endif %}
                 </div>
+                <!-- displays attentiveness/emotion chart and interactions/rapport chart-->
                 <div class="col-sm-2" style="background: #f1f1f1; width: 18.5%;" align="center">
                     <br>
+                    <!-- attentiveness/emotion chart -->
                     {% if info == '2' %}
                         <p class="text-center" style="font-size: 18px;">Attentiveness</p>
                     {% else %}
@@ -472,7 +502,7 @@
                     {% endif %}
 
                     
-                    
+                    <!--interactions/rapport chart-->
                     {% if info == '2' %}
                         <p class="text-center" style="font-size: 18px;">Interactions</p>
                     {% else %}
@@ -496,7 +526,7 @@
                 <!--Left side charts-->
                 <div class="col-sm-2" style="background: #f1f1f1; height: 590px;" align="center">
                     <br>
-                    <!-- Settings -->
+                    <!-- Settings icon and options -->
                     <div class="dropdown show" style="display: inline-block; ">
                         <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <span style="color: black;">
@@ -507,9 +537,9 @@
                                 </svg>
                             </span>
                         </a>
-                    
+                        <!-- settings dropdown -->
                         <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-
+                            <!-- Each option is above the <a></a> with the url's within the href -->
                             Text:
                             <a class="dropdown-item" href="{% url 'scratch' user_id=user_profile.user_id layout=layout size=size info=0 %}">No text / </a>
                             <a class="dropdown-item" href="{% url 'scratch' user_id=user_profile.user_id layout=layout size=size info=1 %}">/ Text / </a>
@@ -540,6 +570,7 @@
                     <!--##########-->
 
                     <br>
+                    <!-- display all meeting participants -->
                     {% if info == '2' %}
                         <p class="text-center" style="font-size: 17px;">Participants</p>
                     {% else %}
@@ -550,6 +581,7 @@
                     {% endfor %}
 
                     <br>
+                    <!-- display talk time chart-->
                     {% if info == '2' %}
                         <p class="text-center" style="font-size: 17px;">Talking Time</p>
                     {% else %}
@@ -562,6 +594,7 @@
                     {% endif %}
 
                     <br>
+                    <!-- display attentiveness/emotion chart -->
                     {% if info == '2' %}
                         <p class="text-center" style="font-size: 18px;">Attentiveness</p>
                     {% else %}
@@ -581,6 +614,7 @@
                     
 
                     <br>
+                    <!-- display overlap chart -->
                     {% if info == '2' %}
                         <p class="text-center" style="font-size: 17px;">Overlaps</p>
                     {% else %}
@@ -594,6 +628,7 @@
 
 
                     <br>
+                    <!-- display back-channel chart -->
                     {% if info == '2' %}
                         <p class="text-center" style="font-size: 17px;">Back-Channels</p>
                     {% else %}
@@ -606,7 +641,7 @@
                     {% endif %}
 
                     <br>
-                    
+                    <!-- display interactions chart -->
                     {% if info == '2' %}
                         <p class="text-center" style="font-size: 18px;">Interactions</p>
                     {% else %}
@@ -630,7 +665,7 @@
                 <!--Left side charts-->
                 <div class="col-sm-2" style="background: #f1f1f1; height: 1200px;" align="center">
                     <br>
-                    <!-- Settings -->
+                    <!-- Settings icon and options -->
                     <div class="dropdown show" style="display: inline-block; ">
                         <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <span style="color: black;">
@@ -641,9 +676,9 @@
                                 </svg>
                             </span>
                         </a>
-                    
+                        <!-- settings dropdown -->
                         <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-
+                            <!-- Each option is above the <a></a> with the url's within the href -->
                             Text:
                             <a class="dropdown-item" href="{% url 'scratch' user_id=user_profile.user_id layout=layout size=size info=0 %}">No text / </a>
                             <a class="dropdown-item" href="{% url 'scratch' user_id=user_profile.user_id layout=layout size=size info=1 %}">/ Text / </a>
@@ -674,6 +709,7 @@
                     <!--##########-->
 
                     <br>
+                    <!-- display all meeting participants -->
                     {% if info == '2' %}
                         <p class="text-center" style="font-size: 17px;">Participants</p>
                     {% else %}
@@ -684,6 +720,7 @@
                     {% endfor %}
 
                     <br>
+                    <!-- display talk time chart -->
                     {% if info == '2' %}
                         <p class="text-center" style="font-size: 17px;">Talking Time</p>
                     {% else %}
@@ -696,6 +733,7 @@
                     {% endif %}
 
                     <br>
+                    <!-- display emotion chart -->
                     {% if info == '2' %}
                         <p class="text-center" style="font-size: 18px;">Attentiveness</p>
                     {% else %}
@@ -710,6 +748,7 @@
                     <!--#############-->
 
                     <br>
+                    <!-- display overlap chart -->
                     {% if info == '2' %}
                         <p class="text-center" style="font-size: 17px;">Overlaps</p>
                     {% else %}
@@ -723,6 +762,7 @@
 
 
                     <br>
+                    <!-- display back-channel chart -->
                     {% if info == '2' %}
                         <p class="text-center" style="font-size: 17px;">Back-Channels</p>
                     {% else %}
@@ -735,7 +775,7 @@
                     {% endif %}
 
                     <br>
-                    
+                    <!-- display interaction chart -->
                     {% if info == '2' %}
                         <p class="text-center" style="font-size: 18px;">Interactions</p>
                     {% else %}
@@ -757,7 +797,7 @@
             <div class="row">
                 <div class="col-sm-2" style="background: #f1f1f1; height: 590px;" align="center">
                     <br>
-                    <!-- Settings -->
+                    <!-- Settings icon and options -->
                     <div class="dropdown show" style="display: inline-block; ">
                         <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <span style="color: black;">
@@ -768,9 +808,9 @@
                                 </svg>
                             </span>
                         </a>
-                    
-                        <div class="dropdown-menu" aria-labelledby="dropdownMenuLink" style="font-size: {{settings_font}}px; padding: 5px;">
-        
+                        <!-- settings dropdown -->
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                            <!-- Each option is above the <a></a> with the url's within the href -->
                             Text:
                             <a class="dropdown-item" href="{% url 'scratch' user_id=user_profile.user_id layout=layout size=size info=0 %}">No text / </a>
                             <a class="dropdown-item" href="{% url 'scratch' user_id=user_profile.user_id layout=layout size=size info=1 %}">/ Text / </a>
@@ -801,6 +841,7 @@
                     
                     <!--LEFT SIDE CHARTS-->
                     <br>
+                    <!-- display all meeting participants -->
                     {% if info == '2' %}
                         <p class="text-center" style="font-size: 17px;">Participants</p>
                     {% else %}
@@ -811,6 +852,7 @@
                     {% endfor %}
 
                     <br>
+                    <!-- display emotion chart -->
                     {% if info == '2' %}
                         <p class="text-center" style="font-size: 18px;">Attentiveness</p>
                     {% else %}
@@ -823,8 +865,7 @@
                     {% endif %}
 
                     <br>
-
-                    
+                    <!-- display interaction chart -->
                     {% if info == '2' %}
                         <p class="text-center" style="font-size: 18px;">Interactions</p>
                     {% else %}
@@ -839,12 +880,14 @@
 
                 </div>
 
+                <!-- empty middle space between charts for zoom call -->
                 <div class="col-sm-8">
                     &nbsp;
                 </div>
 
                 <div class="col-sm-2" style="background: #f1f1f1; height: 590px;" align="center">
                     <br>
+                    <!-- display talk time chart -->
                     {% if info == '2' %}
                         <p class="text-center" style="font-size: 17px;">Talking Time</p>
                     {% else %}
@@ -858,6 +901,7 @@
 
 
                     <br>
+                    <!-- display overlap chart -->
                     {% if info == '2' %}
                         <p class="text-center" style="font-size: 17px;">Overlaps</p>
                     {% else %}
@@ -871,6 +915,7 @@
 
 
                     <br>
+                    <!-- display back-channels chart -->
                     {% if info == '2' %}
                         <p class="text-center" style="font-size: 17px;">Back-Channels</p>
                     {% else %}

@@ -133,7 +133,7 @@ def Scratch(request, user_id, layout, size, info):
         overlap_data.append((user_name, overlaps, all_colors[i]))
         backchannel_data.append((user_name, backchannels, all_colors[i]))
         
-        if user_name == all_users[0].username:
+        if row.user_id.user_id == user_profile.user_id:
             emotion_data = emotion
 
 

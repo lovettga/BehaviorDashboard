@@ -2,6 +2,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <!-- This HTML page is used solely to test design ideas and implementation for use in other HTML documents (like scratch.html) -->
 
     <!-- Bootstrap -->
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
@@ -10,6 +11,7 @@
     <link rel="stylesheet" type="text/css" href="/dashboard/dash_ui/static/css/style.css">
 
 
+    <!-- determines page refresh rate, change "content" value to influence seconds-->
     <meta http-equiv="refresh" content="2">
 
     
@@ -20,6 +22,7 @@
     <!-- Google Charts -->
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 
+    <!-- FOR COMMENTS ON CHARTS LOOK AT THE SCRATCH.HTML DOCUMENT -->
     <script type="text/javascript">
       google.charts.load('current', {'packages':['corechart']});
       google.charts.load('current', {'packages':['gauge']});
@@ -171,7 +174,7 @@
 
     </script>
 
-    <!-- Gauge Chart Styling stuff -->
+    <!-- Gauge Chart Styling stuff (SEE ON SCRATCH.HTML TOO) -->
     <style>
         /* Outer-ring */
         #emotionchart circle:nth-child(1) {
@@ -238,30 +241,35 @@
     <h3 style="margin-left: 5px;">Testing the mySQL database</h3>
 
 
-
+    <!-- displays charts with data from database -->
     <div class="container" style="padding-top: 2%; width: 95%;">
         <div class="row" style="background: #f1f1f1; height: 250px;">
             <div class="col-sm-2" style="background: #f1f1f1; width: 20%;" align="center">
                 <br>
+                <!-- talk time chart -->
                 <div id="talkchart" style="width: 100%; height: 200px;"></div>
             </div>
             
             <div class="col-sm-2" style="background: #f1f1f1; width: 20%;" align="center">
                 <br>
+                <!-- overlap chart -->
                 <div id="overlapchart" style="width: 100%; height: 120px;"></div>
             </div>
             <div class="col-sm-2" style="background: #f1f1f1; width: 20%;" align="center">
                 <br>
+                <!-- backchannel chart -->
                 <div id="backchannelchart" style="width: 100%; height: 120px;"></div>
             </div>
             <div class="col-sm-2" style="background: #f1f1f1; width: 20%;" align="center">
                 <br>
+                <!-- emotion chart -->
                 <div id="emotionchart" style="width: 100%; height: 120px;"></div>
             </div>
         
         
             <div class="col-sm-2" style="background: #f1f1f1; width: 20%;" align="center">
                 <br>
+                <!-- displays all users -->
                 <p><strong>All Users</strong></p>
                 {% for each_user in user_colors%}
                     <p>{{each_user.0}} <span class="badge" style="background-color: {{each_user.1}}">&nbsp;</span></p>
@@ -271,7 +279,7 @@
         </div>
     </div>
 
-
+    <!-- Shows in a table the information from the talkstream table in the database (not for use in the actual display) -->
     <div class="container">
         <div class="col-sm-2" style="background: #f1f1f1; width: 40%;" align="center">
             <h4 style="margin-left: 30px;">Talkstream Table</h4>
@@ -292,6 +300,8 @@
                 </tbody>
             </table>
         </div>
+
+        <!-- Shows the data for the display in a table form -->
         <div class="col-sm-2" style="background: #f1f1f1; width: 40%;" align="center">
             <h4 style="margin-left: 30px;">Display Table Data</h4>
             <table class="table" style="width: 500px;">
@@ -320,6 +330,7 @@
         </div>
     </div>
     
+    <!-- Other testing tables are below and commented out because they have no practical use -->
 <!--
     <div class="container">
         <h4 style="margin-left: 30px;">Key Test Table</h4>

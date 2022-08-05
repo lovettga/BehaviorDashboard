@@ -3,6 +3,8 @@ from django.db import models
 # Create your models here.
 # py manage.py inspectdb > models.py 
 # ^^ USE THIS TO GET THE UPDATED MODELS.PY FROM THE DASHABORD DATABASE
+# by copying the line into the terminal, this will update the OTHER models.py under dashboard
+# copy and paste the desired models here for use in views.py
 
 
 class HDisplaytable(models.Model):
